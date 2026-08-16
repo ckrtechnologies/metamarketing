@@ -47,7 +47,7 @@ async function getMetaCloudTemplates() {
 }
 
 // ── Submit a new template to Meta WhatsApp Cloud API ─────────
-async function submitTemplateToMeta({ name, category, body, language = 'en_US' }) {
+async function submitTemplateToMeta({ name, category, body, language = 'en' }) {
   const wabaId = process.env.WHATSAPP_BUSINESS_ACCOUNT_ID;
   const token = process.env.WHATSAPP_ACCESS_TOKEN;
 
@@ -60,18 +60,40 @@ async function submitTemplateToMeta({ name, category, body, language = 'en_US' }
 
   // Convert {{variableName}} into Meta's {{1}}, {{2}} format
   let paramIndex = 1;
-  const metaBody = body.replace(/\{\{[a-zA-Z0-9_]+\}\}/g, () => `{{${paramIndex++}}}`);
+  const sampleValues = [];
+  const metaBody = body.replace(/\{\{([a-zA-Z0-9_]+)\}\}/g, (_, varName) => {
+    const idx = paramIndex++;
+    if (varName.toLowerCase().includes('name') || varName.toLowerCase().includes('customer')) {
+      sampleValues.push('John Doe');
+    } else if (varName.toLowerCase().includes('amount') || varName.toLowerCase().includes('price') || varName.toLowerCase().includes('bill')) {
+      sampleValues.push('1500');
+    } else if (varName.toLowerCase().includes('date') || varName.toLowerCase().includes('till')) {
+      sampleValues.push('25-Aug-2026');
+    } else if (varName.toLowerCase().includes('shop')) {
+      sampleValues.push('CKR Technologies');
+    } else {
+      sampleValues.push(`Sample Value ${idx}`);
+    }
+    return `{{${idx}}}`;
+  });
+
+  const bodyComponent = {
+    type: 'BODY',
+    text: metaBody,
+  };
+
+  // Meta REQUIRES an example object if there are variables
+  if (sampleValues.length > 0) {
+    bodyComponent.example = {
+      body_text: [sampleValues],
+    };
+  }
 
   const payload = {
     name: formattedName,
     category: (category || 'MARKETING').toUpperCase(),
     language,
-    components: [
-      {
-        type: 'BODY',
-        text: metaBody,
-      },
-    ],
+    components: [bodyComponent],
   };
 
   const { data } = await axios.post(`https://graph.facebook.com/v19.0/${wabaId}/message_templates`, payload, {
