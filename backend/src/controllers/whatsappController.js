@@ -150,12 +150,12 @@ exports.getTemplates = async (req, res) => {
 exports.createTemplate = async (req, res) => {
   try {
     const shopId = getShopId(req);
-    const { name, category, description, body, icon, submitToMeta } = req.body;
+    const { name, category, body, language = 'en' } = req.body;
     if (!name || !name.trim()) return res.status(400).json({ success: false, error: 'Template name is required.' });
     if (!body || !body.trim()) return res.status(400).json({ success: false, error: 'Template message body is required.' });
 
-    const newTemplate = await whatsappService.createTemplate({ name, category, description, body, icon, submitToMeta }, shopId);
-    res.status(201).json({ success: true, data: newTemplate, message: `Template "${newTemplate.name}" created.` });
+    const newTemplate = await whatsappService.createTemplate({ name, category, body, language }, shopId);
+    res.status(201).json({ success: true, data: newTemplate, message: `Template "${newTemplate.name}" created and registered on Meta WABA.` });
   } catch (err) {
     const f = formatError(err);
     res.status(500).json({ success: false, error: f.message, code: f.code });
@@ -163,11 +163,12 @@ exports.createTemplate = async (req, res) => {
 };
 
 // ── DELETE /api/v2/whatsapp/templates/:id ─────────────────────
-exports.deleteTemplate = (req, res) => {
+exports.deleteTemplate = async (req, res) => {
   try {
+    const shopId = getShopId(req);
     const { id } = req.params;
-    const removed = whatsappService.deleteTemplate(id);
-    res.json({ success: true, message: `Template "${removed.name}" deleted.`, data: removed });
+    const result = await whatsappService.deleteTemplate(id, shopId);
+    res.json({ success: true, message: `Template deleted from Meta WABA.`, data: result });
   } catch (err) {
     const f = formatError(err);
     const status = f.message.includes('not found') ? 404 : 500;

@@ -748,31 +748,42 @@ export default function WhatsAppHub({ shop }) {
               </button>
             </div>
 
-            <div className="wa-templates-grid">
-              {templates.map(tpl => (
-                <div
-                  key={tpl.id}
-                  className={`wa-template-card ${selectedTemplate?.id === tpl.id ? 'wa-template-card--selected' : ''}`}
-                  onClick={() => setSelectedTemplate(tpl)}
+            {templates.length === 0 ? (
+              <div className="wa-templates-empty">
+                <p>No templates registered yet on Meta WhatsApp Cloud API.</p>
+                <button
+                  type="button"
+                  className="wa-create-tpl-btn"
+                  onClick={() => setShowCreateTplModal(true)}
                 >
-                  <div className="wa-template-card-top">
-                    <span className="wa-template-icon">{tpl.name.split(' ')[0]}</span>
-                    {tpl.isCustom && (
+                  ➕ Create First Template
+                </button>
+              </div>
+            ) : (
+              <div className="wa-templates-grid">
+                {templates.map(tpl => (
+                  <div
+                    key={tpl.id}
+                    className={`wa-template-card ${selectedTemplate?.id === tpl.id ? 'wa-template-card--selected' : ''}`}
+                    onClick={() => setSelectedTemplate(tpl)}
+                  >
+                    <div className="wa-template-card-top">
+                      <span className="wa-template-icon">{tpl.name.split(' ')[0]}</span>
                       <button
                         type="button"
                         className="wa-tpl-delete-btn"
                         onClick={(e) => handleDeleteTemplate(tpl, e)}
-                        title="Delete custom template"
+                        title="Delete template from Meta WABA"
                       >
                         🗑️
                       </button>
-                    )}
+                    </div>
+                    <span className="wa-template-name">{tpl.name.slice(tpl.name.indexOf(' ') + 1)}</span>
+                    <span className="wa-template-desc">{tpl.description}</span>
                   </div>
-                  <span className="wa-template-name">{tpl.name.slice(tpl.name.indexOf(' ') + 1)}</span>
-                  <span className="wa-template-desc">{tpl.description}</span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Dynamic Variables Form */}

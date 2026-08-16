@@ -166,9 +166,24 @@ async function submitTemplateToMeta({ name, category, body, language = 'en' }, s
     };
   }
 
+  // Map user category to Meta's strict category enum
+  const categoryMap = {
+    payment: 'UTILITY',
+    order: 'UTILITY',
+    reminder: 'UTILITY',
+    utility: 'UTILITY',
+    promotion: 'MARKETING',
+    festival: 'MARKETING',
+    general: 'MARKETING',
+    marketing: 'MARKETING',
+    auth: 'AUTHENTICATION',
+    authentication: 'AUTHENTICATION',
+  };
+  const metaCategory = categoryMap[String(category || '').toLowerCase()] || 'MARKETING';
+
   const payload = {
     name: formattedName,
-    category: (category || 'MARKETING').toUpperCase(),
+    category: metaCategory,
     language,
     components: [bodyComponent],
   };
@@ -183,62 +198,9 @@ async function submitTemplateToMeta({ name, category, body, language = 'en' }, s
   return data;
 }
 
-// ── Load all templates (Local + Meta Cloud) ───────────────────
-function getLocalTemplates() {
-  try {
-    const raw = fs.readFileSync(TEMPLATES_PATH, 'utf8');
-    return JSON.parse(raw);
-  } catch {
-    return [];
-  }
-}
-
+// ── Load only official Meta Cloud templates ───────────────────
 async function getAllTemplates(shopId = null) {
-  const local = getLocalTemplates();
-  const metaCloud = await getMetaCloudTemplates(shopId);
-
-  // Clean name helper e.g. "📢 templet2" -> "templet2"
-  const cleanName = (str) => String(str || '').replace(/^[\uD800-\uDBFF\uDC00-\uDFFF\u2600-\u27BF\s]+/, '').trim().toLowerCase().replace(/[^a-z0-9_]/g, '_');
-
-  const combined = [];
-
-  // Add local templates, upgrading them if they exist in Meta Cloud
-  local.forEach(loc => {
-    const locClean = cleanName(loc.name);
-    const matchingMeta = metaCloud.find(mt => cleanName(mt.metaName || mt.name) === locClean);
-
-    if (matchingMeta) {
-      // Upgrade local template with Meta official credentials & params
-      combined.push({
-        ...loc,
-        ...matchingMeta,
-        id: loc.id,
-        name: `☁️ ${locClean}`,
-        isMetaOfficial: true,
-        metaName: matchingMeta.metaName,
-        paramCount: matchingMeta.paramCount,
-        language: matchingMeta.language,
-      });
-    } else {
-      combined.push(loc);
-    }
-  });
-
-  // Add remaining Meta Cloud templates not already merged
-  metaCloud.forEach(mt => {
-    const mtClean = cleanName(mt.metaName || mt.name);
-    if (!combined.some(c => cleanName(c.metaName || c.name) === mtClean)) {
-      combined.push(mt);
-    }
-  });
-
-  return combined;
-}
-
-function saveTemplates(templates) {
-  // Only save non-meta templates locally
-  const localOnly = templates.filter(t => !t.isMetaOfficial);
-  fs.writeFileSync(TEMPLATES_PATH, JSON.stringify(localOnly, null, 2), 'utf8');
+  return await getMetaCloudTemplates(shopId);
 }
 
 async function getTemplate(templateId, shopId = null) {
@@ -252,60 +214,47 @@ async function getTemplate(templateId, shopId = null) {
     t.id.toLowerCase().includes(`_${clean}`) ||
     t.name.toLowerCase().includes(clean)
   );
-  if (!tpl) throw new Error(`Template "${templateId}" not found.`);
+  if (!tpl) throw new Error(`Template "${templateId}" not found in Meta Cloud API.`);
   return tpl;
 }
 
-// ── Create a new custom template ──────────────────────────────
-async function createTemplate({ name, category, description, body, icon = '📝', submitToMeta = false }, shopId = null) {
+// ── Create a new template directly on Meta Cloud API ───────────
+async function createTemplate({ name, category, body, language = 'en' }, shopId = null) {
   if (!name || !name.trim()) throw new Error('Template name is required.');
   if (!body || !body.trim()) throw new Error('Template message body is required.');
 
-  const templates = getLocalTemplates();
+  // Submit directly to Meta WABA
+  const metaResponse = await submitTemplateToMeta({ name, category, body, language }, shopId);
+  console.log(`[whatsappService] Template "${name}" submitted to Meta WABA:`, metaResponse);
 
-  // Extract variables inside {{variableName}}
-  const matches = body.match(/\{\{([a-zA-Z0-9_]+)\}\}/g) || [];
-  const variables = Array.from(new Set(matches.map(m => m.replace(/[\{\}]/g, ''))));
-
-  const id = `custom_${Date.now()}_${name.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 15)}`;
-  const displayName = `${icon} ${name.trim()}`;
-
-  let metaResponse = null;
-  if (submitToMeta) {
-    try {
-      metaResponse = await submitTemplateToMeta({ name, category, body }, shopId);
-      console.log(`[whatsappService] Template "${name}" submitted to Meta WABA:`, metaResponse);
-    } catch (metaErr) {
-      console.warn('[whatsappService] Could not submit to Meta:', metaErr.response?.data?.error?.message || metaErr.message);
-    }
-  }
-
-  const newTemplate = {
-    id,
-    name: displayName,
-    category: category || 'general',
-    description: description || 'Custom template created by user',
-    variables,
+  return {
+    id: `meta_${name.toLowerCase().replace(/[^a-z0-9_]/g, '_')}`,
+    metaName: name.toLowerCase().replace(/[^a-z0-9_]/g, '_'),
+    name: `☁️ ${name}`,
+    category: (category || 'MARKETING').toUpperCase(),
+    description: `Official Meta Cloud Template (${metaResponse.status || 'PENDING'})`,
     body: body.trim(),
-    isCustom: true,
-    submittedToMeta: Boolean(metaResponse),
-    createdAt: new Date().toISOString(),
+    isMetaOfficial: true,
+    metaStatus: metaResponse.status || 'PENDING',
+    language,
   };
-
-  templates.push(newTemplate);
-  saveTemplates(templates);
-  return newTemplate;
 }
 
-// ── Delete a custom template ──────────────────────────────────
-function deleteTemplate(templateId) {
-  const templates = getLocalTemplates();
-  const idx = templates.findIndex(t => t.id === templateId);
-  if (idx === -1) throw new Error(`Template "${templateId}" not found.`);
+// ── Delete a template from Meta Cloud API ──────────────────────
+async function deleteTemplate(templateName, shopId = null) {
+  const { wabaId, accessToken: token } = getWhatsAppConfig(shopId);
+  const cleanName = String(templateName || '').replace(/^meta_/, '').replace(/^☁️\s*/, '');
 
-  const [removed] = templates.splice(idx, 1);
-  saveTemplates(templates);
-  return removed;
+  if (!wabaId || !token) {
+    throw new Error('WhatsApp Business Account ID and Access Token must be configured in shop or .env');
+  }
+
+  const { data } = await axios.delete(`https://graph.facebook.com/v19.0/${wabaId}/message_templates`, {
+    headers: { Authorization: `Bearer ${token}` },
+    params: { name: cleanName },
+  });
+
+  return data;
 }
 
 // ── Template Rendering ────────────────────────────────────────
