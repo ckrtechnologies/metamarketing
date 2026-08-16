@@ -16,9 +16,9 @@ function formatError(err) {
 }
 
 // ── GET /api/v2/whatsapp/templates ────────────────────────────
-exports.getTemplates = (req, res) => {
+exports.getTemplates = async (req, res) => {
   try {
-    const templates = whatsappService.getAllTemplates();
+    const templates = await whatsappService.getAllTemplates();
     res.json({ success: true, data: templates });
   } catch (err) {
     const f = formatError(err);
@@ -27,13 +27,13 @@ exports.getTemplates = (req, res) => {
 };
 
 // ── POST /api/v2/whatsapp/templates ───────────────────────────
-exports.createTemplate = (req, res) => {
+exports.createTemplate = async (req, res) => {
   try {
-    const { name, category, description, body, icon } = req.body;
+    const { name, category, description, body, icon, submitToMeta } = req.body;
     if (!name || !name.trim()) return res.status(400).json({ success: false, error: 'Template name is required.' });
     if (!body || !body.trim()) return res.status(400).json({ success: false, error: 'Template message body is required.' });
 
-    const newTemplate = whatsappService.createTemplate({ name, category, description, body, icon });
+    const newTemplate = await whatsappService.createTemplate({ name, category, description, body, icon, submitToMeta });
     res.status(201).json({ success: true, data: newTemplate, message: `Template "${newTemplate.name}" created.` });
   } catch (err) {
     const f = formatError(err);

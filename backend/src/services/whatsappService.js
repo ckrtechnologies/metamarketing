@@ -4,8 +4,87 @@ const axios = require('axios');
 
 const TEMPLATES_PATH = path.resolve(__dirname, '../../data/wa_templates.json');
 
-// ── Load templates from JSON ──────────────────────────────────
-function getAllTemplates() {
+// ── Fetch official templates from Meta WhatsApp Cloud API ────
+async function getMetaCloudTemplates() {
+  const wabaId = process.env.WHATSAPP_BUSINESS_ACCOUNT_ID;
+  const token = process.env.WHATSAPP_ACCESS_TOKEN;
+
+  if (!wabaId || !token) return [];
+
+  try {
+    const { data } = await axios.get(`https://graph.facebook.com/v19.0/${wabaId}/message_templates`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { limit: 50 },
+    });
+
+    return (data.data || []).map(metaTpl => {
+      // Extract body text from components
+      const bodyComp = metaTpl.components?.find(c => c.type === 'BODY');
+      const bodyText = bodyComp?.text || metaTpl.name;
+
+      // Extract variables e.g. {{1}}, {{2}}
+      const matches = bodyText.match(/\{\{([0-9]+)\}\}/g) || [];
+      const variables = matches.map((_, i) => `param_${i + 1}`);
+
+      return {
+        id: `meta_${metaTpl.name}`,
+        metaName: metaTpl.name,
+        name: `☁️ ${metaTpl.name}`,
+        category: metaTpl.category?.toLowerCase() || 'general',
+        description: `Official Meta Cloud Template (${metaTpl.status})`,
+        variables: variables.length > 0 ? variables : ['customerName'],
+        body: bodyText,
+        isMetaOfficial: true,
+        metaStatus: metaTpl.status,
+        language: metaTpl.language,
+      };
+    });
+  } catch (err) {
+    console.warn('[whatsappService:getMetaCloudTemplates] Failed to fetch Meta templates:', err.response?.data?.error?.message || err.message);
+    return [];
+  }
+}
+
+// ── Submit a new template to Meta WhatsApp Cloud API ─────────
+async function submitTemplateToMeta({ name, category, body, language = 'en_US' }) {
+  const wabaId = process.env.WHATSAPP_BUSINESS_ACCOUNT_ID;
+  const token = process.env.WHATSAPP_ACCESS_TOKEN;
+
+  if (!wabaId || !token) {
+    throw new Error('WHATSAPP_BUSINESS_ACCOUNT_ID and WHATSAPP_ACCESS_TOKEN must be configured in .env');
+  }
+
+  // Meta template name must be lowercase alphanumeric and underscore only
+  const formattedName = name.toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 512);
+
+  // Convert {{variableName}} into Meta's {{1}}, {{2}} format
+  let paramIndex = 1;
+  const metaBody = body.replace(/\{\{[a-zA-Z0-9_]+\}\}/g, () => `{{${paramIndex++}}}`);
+
+  const payload = {
+    name: formattedName,
+    category: (category || 'MARKETING').toUpperCase(),
+    language,
+    components: [
+      {
+        type: 'BODY',
+        text: metaBody,
+      },
+    ],
+  };
+
+  const { data } = await axios.post(`https://graph.facebook.com/v19.0/${wabaId}/message_templates`, payload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  return data;
+}
+
+// ── Load all templates (Local + Meta Cloud) ───────────────────
+function getLocalTemplates() {
   try {
     const raw = fs.readFileSync(TEMPLATES_PATH, 'utf8');
     return JSON.parse(raw);
@@ -14,23 +93,40 @@ function getAllTemplates() {
   }
 }
 
-function saveTemplates(templates) {
-  fs.writeFileSync(TEMPLATES_PATH, JSON.stringify(templates, null, 2), 'utf8');
+async function getAllTemplates() {
+  const local = getLocalTemplates();
+  const metaCloud = await getMetaCloudTemplates();
+
+  // Combine local and Meta Cloud templates (avoid duplicate names)
+  const combined = [...local];
+  metaCloud.forEach(mt => {
+    if (!combined.some(c => c.id === mt.id || c.metaName === mt.metaName)) {
+      combined.push(mt);
+    }
+  });
+
+  return combined;
 }
 
-function getTemplate(templateId) {
-  const templates = getAllTemplates();
+function saveTemplates(templates) {
+  // Only save non-meta templates locally
+  const localOnly = templates.filter(t => !t.isMetaOfficial);
+  fs.writeFileSync(TEMPLATES_PATH, JSON.stringify(localOnly, null, 2), 'utf8');
+}
+
+async function getTemplate(templateId) {
+  const templates = await getAllTemplates();
   const tpl = templates.find(t => t.id === templateId);
   if (!tpl) throw new Error(`Template "${templateId}" not found.`);
   return tpl;
 }
 
 // ── Create a new custom template ──────────────────────────────
-function createTemplate({ name, category, description, body, icon = '📝' }) {
+async function createTemplate({ name, category, description, body, icon = '📝', submitToMeta = false }) {
   if (!name || !name.trim()) throw new Error('Template name is required.');
   if (!body || !body.trim()) throw new Error('Template message body is required.');
 
-  const templates = getAllTemplates();
+  const templates = getLocalTemplates();
 
   // Extract variables inside {{variableName}}
   const matches = body.match(/\{\{([a-zA-Z0-9_]+)\}\}/g) || [];
@@ -38,6 +134,16 @@ function createTemplate({ name, category, description, body, icon = '📝' }) {
 
   const id = `custom_${Date.now()}_${name.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 15)}`;
   const displayName = `${icon} ${name.trim()}`;
+
+  let metaResponse = null;
+  if (submitToMeta) {
+    try {
+      metaResponse = await submitTemplateToMeta({ name, category, body });
+      console.log(`[whatsappService] Template "${name}" submitted to Meta WABA:`, metaResponse);
+    } catch (metaErr) {
+      console.warn('[whatsappService] Could not submit to Meta:', metaErr.response?.data?.error?.message || metaErr.message);
+    }
+  }
 
   const newTemplate = {
     id,
@@ -47,6 +153,7 @@ function createTemplate({ name, category, description, body, icon = '📝' }) {
     variables,
     body: body.trim(),
     isCustom: true,
+    submittedToMeta: Boolean(metaResponse),
     createdAt: new Date().toISOString(),
   };
 
@@ -57,7 +164,7 @@ function createTemplate({ name, category, description, body, icon = '📝' }) {
 
 // ── Delete a custom template ──────────────────────────────────
 function deleteTemplate(templateId) {
-  const templates = getAllTemplates();
+  const templates = getLocalTemplates();
   const idx = templates.findIndex(t => t.id === templateId);
   if (idx === -1) throw new Error(`Template "${templateId}" not found.`);
 

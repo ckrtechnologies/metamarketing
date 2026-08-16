@@ -192,12 +192,13 @@ export default function WhatsAppHub({ shop }) {
         description: newTpl.description.trim() || `Custom ${newTpl.category} template`,
         body: newTpl.body.trim(),
         icon: newTpl.icon,
+        submitToMeta: Boolean(newTpl.submitToMeta),
       });
 
       setTemplates(prev => [...prev, created]);
       setSelectedTemplate(created);
       setShowCreateTplModal(false);
-      setNewTpl({ name: '', category: 'promotion', description: '', body: '', icon: '📢' });
+      setNewTpl({ name: '', category: 'promotion', description: '', body: '', icon: '📢', submitToMeta: false });
       showSuccess(`✅ Template "${created.name}" created!`);
     } catch (err) {
       setError(err.response?.data?.error || err.message);
@@ -763,6 +764,19 @@ export default function WhatsAppHub({ shop }) {
                   onChange={e => setNewTpl(p => ({ ...p, body: e.target.value }))}
                   required
                 />
+              </div>
+
+              {/* Submit to Meta Cloud Option */}
+              <div className="wa-meta-opt-in">
+                <label className="wa-checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(newTpl.submitToMeta)}
+                    onChange={e => setNewTpl(p => ({ ...p, submitToMeta: e.target.checked }))}
+                    className="wa-checkbox"
+                  />
+                  <span>☁️ Submit to Meta WhatsApp Cloud (Registers template directly with Meta for cold sends)</span>
+                </label>
               </div>
 
               {/* Live Preview Inside Modal */}

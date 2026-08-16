@@ -921,6 +921,23 @@
   border-color: #25D366;
 }
 
+.wa-meta-opt-in {
+  padding: 10px 14px;
+  background: rgba(37, 211, 102, 0.08);
+  border: 1px dashed rgba(37, 211, 102, 0.25);
+  border-radius: 10px;
+}
+
+.wa-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #34d399;
+  cursor: pointer;
+}
+
 .wa-modal-preview {
   display: flex;
   flex-direction: column;
