@@ -9,6 +9,7 @@ export default function WhatsAppHistory({ shopId, shopName, lastSentTime }) {
   const [statusFilter, setStatusFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [selectedMessage, setSelectedMessage] = useState(null);
+  const [showReportModal, setShowReportModal] = useState(false);
 
   const loadData = useCallback(async () => {
     if (!shopId) return;
@@ -29,10 +30,6 @@ export default function WhatsAppHistory({ shopId, shopName, lastSentTime }) {
 
   useEffect(() => {
     loadData();
-    const interval = setInterval(() => {
-      loadData();
-    }, 4000);
-    return () => clearInterval(interval);
   }, [loadData, lastSentTime]);
 
   const formatDate = (isoString) => {
@@ -47,31 +44,94 @@ export default function WhatsAppHistory({ shopId, shopName, lastSentTime }) {
     });
   };
 
+  const formatTimeOnly = (isoString) => {
+    if (!isoString) return '';
+    const d = new Date(isoString);
+    return d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+  };
+
+  // ── Export Delivery Report to CSV ────────────────────────────
+  const handleExportCSV = () => {
+    if (!history.items || history.items.length === 0) {
+      alert('No message delivery data to export.');
+      return;
+    }
+
+    const headers = [
+      'Recipient Name',
+      'Recipient Phone',
+      'Template Name',
+      'Channel',
+      'Delivery Status',
+      'Dispatched At',
+      'Delivered At',
+      'Read At',
+      'Meta WAMID',
+      'Failure Reason',
+      'Rendered Message',
+    ];
+
+    const rows = history.items.map(m => [
+      `"${(m.recipientName || '').replace(/"/g, '""')}"`,
+      `"${(m.recipientPhone || '').replace(/"/g, '""')}"`,
+      `"${(m.templateName || '').replace(/"/g, '""')}"`,
+      `"${m.deliveryMode === 'cloud' ? 'Meta Cloud API' : 'wa.me'}"`,
+      `"${(m.status || '').toUpperCase()}"`,
+      `"${m.sentAt ? new Date(m.sentAt).toLocaleString('en-IN') : ''}"`,
+      `"${m.deliveredAt ? new Date(m.deliveredAt).toLocaleString('en-IN') : ''}"`,
+      `"${m.readAt ? new Date(m.readAt).toLocaleString('en-IN') : ''}"`,
+      `"${(m.wamid || '').replace(/"/g, '""')}"`,
+      `"${(m.errorMessage || '').replace(/"/g, '""')}"`,
+      `"${(m.renderedBody || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`,
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `WhatsApp_Delivery_Report_${shopName || 'Shop'}_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const renderStatusBadge = (msg) => {
     switch (msg.status) {
       case 'read':
         return (
-          <span className="wa-hist-badge wa-hist-badge--read" title="Message read by customer">
-            <span className="wa-tick wa-tick--read">✓✓</span> Read
-          </span>
+          <div className="wa-hist-status-col">
+            <span className="wa-hist-badge wa-hist-badge--read" title={`Read at ${formatDate(msg.readAt)}`}>
+              <span className="wa-tick wa-tick--read">✓✓</span> Read
+            </span>
+            {msg.readAt && <span className="wa-hist-status-sub">{formatTimeOnly(msg.readAt)}</span>}
+          </div>
         );
       case 'delivered':
         return (
-          <span className="wa-hist-badge wa-hist-badge--delivered" title="Delivered to customer's phone">
-            <span className="wa-tick wa-tick--delivered">✓✓</span> Delivered
-          </span>
+          <div className="wa-hist-status-col">
+            <span className="wa-hist-badge wa-hist-badge--delivered" title={`Delivered to device at ${formatDate(msg.deliveredAt)}`}>
+              <span className="wa-tick wa-tick--delivered">✓✓</span> Delivered
+            </span>
+            {msg.deliveredAt && <span className="wa-hist-status-sub">{formatTimeOnly(msg.deliveredAt)}</span>}
+          </div>
         );
       case 'sent':
         return (
-          <span className="wa-hist-badge wa-hist-badge--sent" title="Dispatched from Meta server">
-            <span className="wa-tick wa-tick--sent">✓</span> Sent
-          </span>
+          <div className="wa-hist-status-col">
+            <span className="wa-hist-badge wa-hist-badge--sent" title="Dispatched to Meta Cloud - Waiting for phone receipt">
+              <span className="wa-tick wa-tick--sent">✓</span> Dispatched
+            </span>
+            <span className="wa-hist-status-sub">Awaiting Device</span>
+          </div>
         );
       case 'failed':
         return (
-          <span className="wa-hist-badge wa-hist-badge--failed" title={msg.errorMessage || 'Message delivery failed'}>
-            <span className="wa-tick wa-tick--failed">✕</span> Failed
-          </span>
+          <div className="wa-hist-status-col">
+            <span className="wa-hist-badge wa-hist-badge--failed" title={msg.errorMessage || 'Undelivered to phone'}>
+              <span className="wa-tick wa-tick--failed">✕</span> Undelivered
+            </span>
+            {msg.errorMessage && <span className="wa-hist-status-sub wa-hist-status-sub--err">{msg.errorMessage}</span>}
+          </div>
         );
       default:
         return <span className="wa-hist-badge">{msg.status}</span>;
@@ -80,13 +140,13 @@ export default function WhatsAppHistory({ shopId, shopName, lastSentTime }) {
 
   return (
     <div className="wa-history-module">
-      {/* ── KPI METRICS CARDS ──────────────────────────────── */}
+      {/* ── KPI METRICS CARDS & REPORT SUMMARY ──────────────── */}
       <div className="wa-hist-metrics-grid">
         <div className="wa-hist-metric-card">
           <div className="wa-hist-metric-icon">📤</div>
           <div className="wa-hist-metric-info">
             <span className="wa-hist-metric-val">{stats.total}</span>
-            <span className="wa-hist-metric-label">Total Messages</span>
+            <span className="wa-hist-metric-label">Total Dispatched</span>
           </div>
         </div>
 
@@ -110,7 +170,7 @@ export default function WhatsAppHistory({ shopId, shopName, lastSentTime }) {
           <div className="wa-hist-metric-icon wa-hist-metric-icon--red">⚠️</div>
           <div className="wa-hist-metric-info">
             <span className="wa-hist-metric-val">{stats.failed}</span>
-            <span className="wa-hist-metric-label">Failed Deliveries</span>
+            <span className="wa-hist-metric-label">Undelivered / Failed</span>
           </div>
         </div>
       </div>
@@ -120,10 +180,10 @@ export default function WhatsAppHistory({ shopId, shopName, lastSentTime }) {
         <div className="wa-hist-filter-tabs">
           {[
             { id: 'all', label: 'All Messages', count: stats.total },
-            { id: 'sent', label: 'Sent', count: stats.sent },
+            { id: 'sent', label: 'Dispatched', count: stats.sent },
             { id: 'delivered', label: 'Delivered', count: stats.delivered },
             { id: 'read', label: 'Read', count: stats.read },
-            { id: 'failed', label: 'Failed', count: stats.failed },
+            { id: 'failed', label: 'Undelivered', count: stats.failed },
           ].map(tab => (
             <button
               key={tab.id}
@@ -136,29 +196,47 @@ export default function WhatsAppHistory({ shopId, shopName, lastSentTime }) {
           ))}
         </div>
 
-        <div className="wa-hist-search-box">
-          <span className="wa-hist-search-icon">🔍</span>
-          <input
-            type="text"
-            className="wa-hist-search-input"
-            placeholder="Search by customer, phone, or template…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-          {search && (
-            <button type="button" className="wa-hist-clear-search" onClick={() => setSearch('')}>
-              ✕
-            </button>
-          )}
+        <div className="wa-hist-actions-bar">
           <button
             type="button"
-            className="wa-hist-refresh-btn"
-            onClick={loadData}
-            title="Refresh history"
-            disabled={loading}
+            className="wa-report-action-btn"
+            onClick={() => setShowReportModal(true)}
+            title="View full delivery analytics report"
           >
-            {loading ? '⏳' : '🔄'}
+            📊 Delivery Report
           </button>
+          <button
+            type="button"
+            className="wa-report-action-btn wa-report-action-btn--export"
+            onClick={handleExportCSV}
+            title="Download delivery logs as CSV"
+          >
+            📥 Export CSV
+          </button>
+          <div className="wa-hist-search-box">
+            <span className="wa-hist-search-icon">🔍</span>
+            <input
+              type="text"
+              className="wa-hist-search-input"
+              placeholder="Search by customer, phone, or template…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+            {search && (
+              <button type="button" className="wa-hist-clear-search" onClick={() => setSearch('')}>
+                ✕
+              </button>
+            )}
+            <button
+              type="button"
+              className="wa-hist-refresh-btn"
+              onClick={loadData}
+              title="Refresh delivery report"
+              disabled={loading}
+            >
+              {loading ? '⏳' : '🔄'}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -301,6 +379,85 @@ export default function WhatsAppHistory({ shopId, shopName, lastSentTime }) {
                   type="button"
                   className="wa-form-cancel-btn"
                   onClick={() => setSelectedMessage(null)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── DELIVERY REPORT & AUDIT MODAL ────────────────────── */}
+      {showReportModal && (
+        <div className="wa-modal-overlay" onClick={() => setShowReportModal(false)}>
+          <div className="wa-modal wa-report-modal" onClick={e => e.stopPropagation()}>
+            <div className="wa-modal-header">
+              <div className="wa-modal-title-box">
+                <span className="wa-modal-icon">📊</span>
+                <h3>WhatsApp Delivery Performance & Audit Report</h3>
+              </div>
+              <button
+                type="button"
+                className="wa-modal-close-btn"
+                onClick={() => setShowReportModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="wa-hist-modal-body">
+              <div className="wa-report-summary-box">
+                <div className="wa-report-kpi">
+                  <span className="wa-report-kpi-val">{stats.total}</span>
+                  <span className="wa-report-kpi-label">Total Dispatched</span>
+                </div>
+                <div className="wa-report-kpi wa-report-kpi--green">
+                  <span className="wa-report-kpi-val">{stats.delivered + stats.read}</span>
+                  <span className="wa-report-kpi-label">Confirmed Delivered ({stats.deliveryRate}%)</span>
+                </div>
+                <div className="wa-report-kpi wa-report-kpi--blue">
+                  <span className="wa-report-kpi-val">{stats.read}</span>
+                  <span className="wa-report-kpi-label">Read / Seen ({stats.readRate}%)</span>
+                </div>
+                <div className="wa-report-kpi wa-report-kpi--red">
+                  <span className="wa-report-kpi-val">{stats.failed}</span>
+                  <span className="wa-report-kpi-label">Undelivered ({stats.total > 0 ? Math.round((stats.failed / stats.total) * 100) : 0}%)</span>
+                </div>
+              </div>
+
+              <div className="wa-report-section-title">Delivery Status Explanations</div>
+              <div className="wa-report-guide-grid">
+                <div className="wa-report-guide-item">
+                  <div className="wa-report-guide-badge"><span className="wa-tick wa-tick--sent">✓</span> Dispatched</div>
+                  <p>Successfully processed by Meta's Cloud servers. Handed over to telecom/WhatsApp carrier for delivery.</p>
+                </div>
+                <div className="wa-report-guide-item">
+                  <div className="wa-report-guide-badge"><span className="wa-tick wa-tick--delivered">✓✓</span> Delivered</div>
+                  <p>Packet physically delivered to the recipient's phone (phone is online and connected).</p>
+                </div>
+                <div className="wa-report-guide-item">
+                  <div className="wa-report-guide-badge"><span className="wa-tick wa-tick--read">✓✓</span> Read</div>
+                  <p>The recipient opened the chat and viewed the message contents.</p>
+                </div>
+                <div className="wa-report-guide-item">
+                  <div className="wa-report-guide-badge"><span className="wa-tick wa-tick--failed">✕</span> Undelivered</div>
+                  <p>Message could not reach recipient (e.g. invalid number, phone off &gt;24h, blocked, or unapproved display name).</p>
+                </div>
+              </div>
+
+              <div className="wa-modal-actions" style={{ justifyContent: 'space-between', marginTop: '20px' }}>
+                <button
+                  type="button"
+                  className="wa-report-action-btn wa-report-action-btn--export"
+                  onClick={handleExportCSV}
+                >
+                  📥 Export Full CSV Report
+                </button>
+                <button
+                  type="button"
+                  className="wa-form-cancel-btn"
+                  onClick={() => setShowReportModal(false)}
                 >
                   Close
                 </button>
