@@ -103,9 +103,42 @@ async function fetchEligiblePagesAndInstagram(userAccessToken) {
     } : null,
   }));
 
+  // Fetch accessible WhatsApp Business Accounts & Phone Numbers
+  let whatsappAccounts = [];
+  try {
+    const businessesRes = await axios.get(`${GRAPH_BASE}/me/businesses`, {
+      params: { fields: 'id,name', access_token: userAccessToken },
+    });
+    for (const biz of (businessesRes.data?.data || [])) {
+      try {
+        const wabasRes = await axios.get(`${GRAPH_BASE}/${biz.id}/whatsapp_business_accounts`, {
+          params: { fields: 'id,name,phone_numbers{id,display_phone_number,verified_name,quality_rating}', access_token: userAccessToken },
+        });
+        for (const waba of (wabasRes.data?.data || [])) {
+          for (const phone of (waba.phone_numbers?.data || [])) {
+            whatsappAccounts.push({
+              wabaId: waba.id,
+              wabaName: waba.name,
+              phoneNumberId: phone.id,
+              displayPhoneNumber: phone.display_phone_number,
+              verifiedName: phone.verified_name,
+              qualityRating: phone.quality_rating,
+            });
+          }
+        }
+      } catch (e) {
+        // Skip individual business error
+      }
+    }
+  } catch (waErr) {
+    console.warn('[authService] WhatsApp discovery notice:', waErr.message);
+  }
+
   return {
     user: userRes.data,
     pages,
+    whatsappAccounts,
+    userAccessToken,
   };
 }
 

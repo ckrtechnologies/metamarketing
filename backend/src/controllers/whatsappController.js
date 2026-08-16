@@ -21,25 +21,28 @@ function formatError(err) {
 exports.connectWhatsAppOAuth = async (req, res) => {
   try {
     const shopId = getShopId(req);
-    const { code, wabaId, phoneNumberId } = req.body;
+    const { code, wabaId, phoneNumberId, accessToken: providedToken } = req.body;
 
     if (!shopId) return res.status(400).json({ success: false, error: 'Shop ID is required.', code: 'MISSING_SHOP_ID' });
-    if (!code) return res.status(400).json({ success: false, error: 'Authorization code is required.', code: 'MISSING_AUTH_CODE' });
+    if (!code && !providedToken && !phoneNumberId) {
+      return res.status(400).json({ success: false, error: 'Phone Number ID or Auth Code is required.', code: 'MISSING_PARAMS' });
+    }
 
     const shop = shopRepo.findShopById(shopId);
     if (!shop) return res.status(404).json({ success: false, error: 'Shop not found.', code: 'SHOP_NOT_FOUND' });
 
-    console.log(`[whatsapp:oauth] Exchanging auth code for shop "${shop.shopName}" (${shopId})...`);
+    let accessToken = providedToken || process.env.WHATSAPP_ACCESS_TOKEN;
+    if (code) {
+      const tokenData = await whatsappService.exchangeCodeForWhatsAppToken(code);
+      accessToken = tokenData.access_token;
+    }
 
-    // 1. Exchange code for long-lived system/user token
-    const tokenData = await whatsappService.exchangeCodeForWhatsAppToken(code);
-    const accessToken = tokenData.access_token;
-
-    // 2. Fetch live Phone Number metadata from Meta
+    // Fetch live Phone Number metadata from Meta
     let phoneMeta = {};
-    if (phoneNumberId) {
+    const targetPhoneId = phoneNumberId || process.env.WHATSAPP_PHONE_NUMBER_ID;
+    if (targetPhoneId && accessToken) {
       try {
-        phoneMeta = await whatsappService.fetchWhatsAppPhoneDetails(phoneNumberId, accessToken);
+        phoneMeta = await whatsappService.fetchWhatsAppPhoneDetails(targetPhoneId, accessToken);
       } catch (phoneErr) {
         console.warn('[whatsapp:oauth] Could not fetch phone details:', phoneErr.response?.data?.error?.message || phoneErr.message);
       }

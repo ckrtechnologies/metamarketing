@@ -64,6 +64,12 @@ export default function WhatsAppHub({ shop }) {
 
   // WhatsApp Connection & OAuth State
   const [waStatus, setWaStatus] = useState({ connected: false, loading: true });
+  const [showConnectModal, setShowConnectModal] = useState(false);
+  const [customCreds, setCustomCreds] = useState({
+    phoneNumberId: '',
+    wabaId: '',
+    accessToken: '',
+  });
   const embeddedSessionRef = useRef({ wabaId: null, phoneNumberId: null });
 
   // Template creation modal state
@@ -133,47 +139,26 @@ export default function WhatsAppHub({ shop }) {
     return () => window.removeEventListener('message', handleMetaMessage);
   }, []);
 
-  // ── Launch WhatsApp 1-Click Embedded Signup Modal ─────────────
-  async function handleConnectWhatsApp() {
+  // ── Connect / Switch WhatsApp Number Directly ───────────────
+  async function handleSaveCustomCreds(e) {
+    e.preventDefault();
+    if (!customCreds.phoneNumberId.trim()) return alert('Please enter a Phone Number ID.');
+
     setLoading(l => ({ ...l, oauth: true }));
     setError(null);
     try {
-      const FB = await loadFacebookSDK();
-
-      FB.login((response) => {
-        if (response.authResponse?.code || response.authResponse?.accessToken) {
-          const authCode = response.authResponse.code || response.authResponse.accessToken;
-          const { wabaId, phoneNumberId } = embeddedSessionRef.current;
-
-          connectWhatsAppOAuth(shopId, {
-            code: authCode,
-            wabaId,
-            phoneNumberId,
-          })
-            .then(res => {
-              showSuccess(`🎉 WhatsApp Business connected successfully for ${shopName}!`);
-              loadStatus();
-              loadTemplates();
-            })
-            .catch(err => {
-              setError(err.response?.data?.error || err.message);
-            })
-            .finally(() => setLoading(l => ({ ...l, oauth: false })));
-        } else {
-          setLoading(l => ({ ...l, oauth: false }));
-          if (response.status !== 'connected') {
-            console.log('[WhatsAppHub:OAuth] User closed or cancelled signup.');
-          }
-        }
-      }, {
-        scope: 'whatsapp_business_management,whatsapp_business_messaging',
-        extras: {
-          feature: 'whatsapp_embedded_signup',
-          version: 'v19.0',
-        },
+      await connectWhatsAppOAuth(shopId, {
+        phoneNumberId: customCreds.phoneNumberId.trim(),
+        wabaId: customCreds.wabaId.trim() || undefined,
+        accessToken: customCreds.accessToken.trim() || undefined,
       });
+      showSuccess(`🎉 WhatsApp Number connected for ${shopName}!`);
+      setShowConnectModal(false);
+      loadStatus();
+      loadTemplates();
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.error || err.message);
+    } finally {
       setLoading(l => ({ ...l, oauth: false }));
     }
   }
@@ -495,11 +480,18 @@ export default function WhatsAppHub({ shop }) {
               <button
                 type="button"
                 className="wa-btn-reconnect"
-                onClick={handleConnectWhatsApp}
+                onClick={() => {
+                  setCustomCreds({
+                    phoneNumberId: waStatus.phoneNumberId || '',
+                    wabaId: waStatus.wabaId || '',
+                    accessToken: '',
+                  });
+                  setShowConnectModal(true);
+                }}
                 disabled={loading.oauth}
                 title="Switch or re-link phone number"
               >
-                {loading.oauth ? '⏳' : '🔄 Switch Number'}
+                🔄 Switch Number
               </button>
               <button
                 type="button"
@@ -513,10 +505,13 @@ export default function WhatsAppHub({ shop }) {
             <button
               type="button"
               className="wa-btn-connect-oauth"
-              onClick={handleConnectWhatsApp}
+              onClick={() => {
+                setCustomCreds({ phoneNumberId: '', wabaId: '', accessToken: '' });
+                setShowConnectModal(true);
+              }}
               disabled={loading.oauth}
             >
-              {loading.oauth ? '⏳ Opening Meta Login...' : '⚡ Connect WhatsApp Business (1-Click)'}
+              ⚡ Connect WhatsApp Number
             </button>
           )}
         </div>
@@ -997,6 +992,81 @@ export default function WhatsAppHub({ shop }) {
                   type="button"
                   className="wa-form-cancel-btn"
                   onClick={() => setShowCreateTplModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── CONNECT / SWITCH WHATSAPP MODAL ────────────────── */}
+      {showConnectModal && (
+        <div className="wa-modal-overlay" onClick={() => setShowConnectModal(false)}>
+          <div className="wa-modal" onClick={e => e.stopPropagation()}>
+            <div className="wa-modal-header">
+              <div className="wa-modal-title-box">
+                <span className="wa-modal-icon">📱</span>
+                <h3>Connect / Switch WhatsApp Business Number</h3>
+              </div>
+              <button
+                type="button"
+                className="wa-modal-close-btn"
+                onClick={() => setShowConnectModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveCustomCreds} className="wa-modal-form">
+              <div className="wa-modal-field">
+                <label className="wa-var-label">Phone Number ID *</label>
+                <input
+                  type="text"
+                  className="wa-form-input"
+                  placeholder="e.g. 443930708804530"
+                  value={customCreds.phoneNumberId}
+                  onChange={e => setCustomCreds(p => ({ ...p, phoneNumberId: e.target.value }))}
+                  required
+                />
+                <span className="wa-tag-hint">Find this in WhatsApp Manager &gt; Phone Numbers &gt; Settings</span>
+              </div>
+
+              <div className="wa-modal-field">
+                <label className="wa-var-label">WhatsApp Business Account ID (WABA ID)</label>
+                <input
+                  type="text"
+                  className="wa-form-input"
+                  placeholder="e.g. 469743566216329"
+                  value={customCreds.wabaId}
+                  onChange={e => setCustomCreds(p => ({ ...p, wabaId: e.target.value }))}
+                />
+              </div>
+
+              <div className="wa-modal-field">
+                <label className="wa-var-label">Access Token (optional if already configured)</label>
+                <input
+                  type="password"
+                  className="wa-form-input"
+                  placeholder="Leave empty to use active server token"
+                  value={customCreds.accessToken}
+                  onChange={e => setCustomCreds(p => ({ ...p, accessToken: e.target.value }))}
+                />
+              </div>
+
+              <div className="wa-modal-actions">
+                <button
+                  type="submit"
+                  className="wa-cta-btn wa-cta-btn--bulk"
+                  disabled={loading.oauth}
+                >
+                  {loading.oauth ? '⏳ Verifying with Meta…' : '✅ Link & Verify Number'}
+                </button>
+                <button
+                  type="button"
+                  className="wa-form-cancel-btn"
+                  onClick={() => setShowConnectModal(false)}
                 >
                   Cancel
                 </button>
