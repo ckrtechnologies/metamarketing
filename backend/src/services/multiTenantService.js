@@ -310,6 +310,24 @@ async function deleteFacebookPost(shopId, postId) {
   return data;
 }
 
+// ── Delete Instagram Media ────────────────────────────────────
+async function deleteInstagramMedia(shopId, mediaId) {
+  const shop = getShopOrThrow(shopId);
+  const token = shop.facebook.pageAccessToken;
+
+  try {
+    const { data } = await axios.delete(graphUrl(`/${mediaId}`), {
+      params: { access_token: token },
+    });
+    return data;
+  } catch (err) {
+    if (err.response?.data?.error?.code === 100 || err.response?.data?.error?.error_subcode === 33) {
+      throw new Error('Meta Graph API restricts third-party apps from deleting published Instagram posts for security reasons. Please use the Instagram app or web to delete.');
+    }
+    throw err;
+  }
+}
+
 module.exports = {
   getLiveShopProfile,
   getShopFeeds,
@@ -318,4 +336,5 @@ module.exports = {
   publishPhotoPost,
   publishReelPost,
   deleteFacebookPost,
+  deleteInstagramMedia,
 };

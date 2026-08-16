@@ -191,3 +191,20 @@ exports.deletePost = async (req, res) => {
     res.status(500).json({ success: false, error: formatted.message, code: formatted.code, details: formatted.raw });
   }
 };
+
+// ── DELETE /api/v2/ig/media/:mediaId ──────────────────────────
+exports.deleteInstagramMedia = async (req, res) => {
+  try {
+    const shopId = getShopId(req);
+    const mediaId = req.params.mediaId;
+    if (!shopId) return res.status(400).json({ success: false, error: 'Shop ID is required.', code: 'MISSING_SHOP_ID' });
+    if (!mediaId) return res.status(400).json({ success: false, error: 'Media ID is required.', code: 'MISSING_MEDIA_ID' });
+
+    const result = await multiTenantService.deleteInstagramMedia(shopId, mediaId);
+    res.json({ success: true, message: 'Instagram media deleted successfully.', data: result });
+  } catch (err) {
+    const formatted = formatError(err);
+    console.error(`[multiTenantController:deleteInstagramMedia] ${formatted.code}:`, formatted.raw);
+    res.status(400).json({ success: false, error: formatted.message, code: formatted.code, details: formatted.raw });
+  }
+};

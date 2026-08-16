@@ -54,3 +54,6 @@ export const publishReelPost = (message, videoFile, options = {}) => {
 
 export const deleteFacebookPost = (postId) =>
   api.delete(`/v2/posts/${postId}`).then(r => r.data);
+
+export const deleteInstagramMedia = (mediaId) =>
+  api.delete(`/v2/ig/media/${mediaId}`).then(r => r.data);

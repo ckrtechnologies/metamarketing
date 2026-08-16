@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getShopFeeds, deleteFacebookPost } from '../api/auth';
+import { getShopFeeds, deleteFacebookPost, deleteInstagramMedia } from '../api/auth';
 import './ShopFeeds.css';
 
 export default function ShopFeeds({ shop, refreshTrigger }) {
@@ -41,6 +41,7 @@ export default function ShopFeeds({ shop, refreshTrigger }) {
     load();
   }, [load, refreshTrigger]);
 
+  // ── Delete Facebook Post ────────────────────────────────────
   async function handleDeletePost(postId) {
     if (!window.confirm(`Are you sure you want to permanently delete this post from ${shop?.shopName}'s Facebook Page?`)) {
       return;
@@ -56,6 +57,45 @@ export default function ShopFeeds({ shop, refreshTrigger }) {
     } catch (err) {
       console.error('Delete post error:', err);
       alert('Failed to delete post: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
+  // ── Delete / Manage Instagram Media ─────────────────────────
+  async function handleDeleteInstagram(e, item) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!window.confirm(`Are you sure you want to remove/delete this Instagram media?`)) {
+      return;
+    }
+
+    setDeletingId(item.id);
+    try {
+      await deleteInstagramMedia(item.id);
+      setFeeds(prev => ({
+        ...prev,
+        instagramMedia: prev.instagramMedia.filter(m => m.id !== item.id),
+      }));
+    } catch (err) {
+      const errMsg = err.response?.data?.error || err.message;
+      console.warn('Instagram delete response:', errMsg);
+
+      // Meta restriction policy handler
+      const openInsta = window.confirm(
+        `📌 Meta Note: ${errMsg}\n\nWould you like to open this post directly on Instagram to delete it?`
+      );
+
+      if (openInsta && item.permalink) {
+        window.open(item.permalink, '_blank');
+      }
+
+      // Optimistically hide from local dashboard view
+      setFeeds(prev => ({
+        ...prev,
+        instagramMedia: prev.instagramMedia.filter(m => m.id !== item.id),
+      }));
     } finally {
       setDeletingId(null);
     }
@@ -273,29 +313,53 @@ export default function ShopFeeds({ shop, refreshTrigger }) {
             </div>
           ) : (
             <div className="ig-tiles-grid">
-              {feeds.instagramMedia.map(item => (
-                <a
-                  key={item.id}
-                  href={item.permalink}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="ig-grid-tile"
-                >
-                  <img
-                    src={item.thumbnail_url || item.media_url}
-                    alt={item.caption || ''}
-                    className="ig-grid-img"
-                    loading="lazy"
-                  />
-                  {item.media_type === 'VIDEO' && (
-                    <span className="ig-reel-badge">▶ Reel</span>
-                  )}
-                  <div className="ig-grid-hover">
-                    <span>❤️ {item.like_count || 0}</span>
-                    <span>💬 {item.comments_count || 0}</span>
+              {feeds.instagramMedia.map(item => {
+                const isDeleting = deletingId === item.id;
+
+                return (
+                  <div key={item.id} className="ig-grid-tile">
+                    <img
+                      src={item.thumbnail_url || item.media_url}
+                      alt={item.caption || ''}
+                      className="ig-grid-img"
+                      loading="lazy"
+                    />
+                    {item.media_type === 'VIDEO' && (
+                      <span className="ig-reel-badge">▶ Reel</span>
+                    )}
+
+                    {/* Interactive Hover Overlay */}
+                    <div className="ig-grid-hover">
+                      <div className="ig-hover-stats">
+                        <span>❤️ {item.like_count || 0}</span>
+                        <span>💬 {item.comments_count || 0}</span>
+                      </div>
+
+                      <div className="ig-hover-actions">
+                        <a
+                          href={item.permalink}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="ig-hover-btn ig-hover-btn--view"
+                          title="Open on Instagram"
+                        >
+                          View ↗
+                        </a>
+
+                        <button
+                          type="button"
+                          className="ig-hover-btn ig-hover-btn--delete"
+                          onClick={(e) => handleDeleteInstagram(e, item)}
+                          disabled={isDeleting}
+                          title="Delete / Manage post"
+                        >
+                          🗑️ {isDeleting ? '…' : 'Delete'}
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </a>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

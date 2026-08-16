@@ -328,20 +328,77 @@
 .ig-grid-hover {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.85);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 12px;
   color: #fff;
-  font-size: 13px;
-  font-weight: 700;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 12px;
+  backdrop-filter: blur(4px);
 }
 
 .ig-grid-tile:hover .ig-grid-hover {
   opacity: 1;
+}
+
+.ig-hover-stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ig-hover-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ig-hover-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ig-hover-btn--view {
+  background: rgba(24, 119, 242, 0.2);
+  border-color: #1877f2;
+  color: #93c5fd;
+}
+
+.ig-hover-btn--view:hover {
+  background: #1877f2;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.ig-hover-btn--delete {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #fca5a5;
+}
+
+.ig-hover-btn--delete:hover {
+  background: #ef4444;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.ig-hover-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ── Empty State & Skeleton ──────────────────────────────────── */
