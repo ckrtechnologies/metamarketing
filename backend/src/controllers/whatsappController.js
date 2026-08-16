@@ -546,6 +546,8 @@ exports.handleWebhook = (req, res) => {
       (body.entry || []).forEach(entry => {
         (entry.changes || []).forEach(change => {
           const value = change.value;
+          if (value?.statuses) {
+            value.statuses.forEach(st => {
               const wamid = st.id;
               const status = st.status; // 'sent' | 'delivered' | 'read' | 'failed'
               const timestamp = st.timestamp ? new Date(parseInt(st.timestamp, 10) * 1000).toISOString() : null;
