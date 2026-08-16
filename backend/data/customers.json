@@ -1,0 +1,16 @@
+{
+  "customers": [
+    {
+      "id": "cust_991b4dc1607d4e52",
+      "shopId": "test_shop_001",
+      "name": "Rahul Gupta",
+      "phone": "9876543210",
+      "balanceDue": 1500,
+      "notes": "",
+      "tags": [],
+      "lastReminder": "2026-08-16T07:06:14.353Z",
+      "createdAt": "2026-08-16T07:06:07.505Z",
+      "updatedAt": "2026-08-16T07:06:14.354Z"
+    }
+  ]
+}

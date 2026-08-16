@@ -5,6 +5,7 @@ import ShopHeader from './components/ShopHeader';
 import ShopComposer from './components/ShopComposer';
 import ShopFeeds from './components/ShopFeeds';
 import ShopSwitcher from './components/ShopSwitcher';
+import WhatsAppHub from './components/WhatsAppHub';
 import {
   listShops,
   getShopProfile,
@@ -22,6 +23,7 @@ export default function App() {
   const [activeShop, setActiveShop] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [activeTab, setActiveTab] = useState('publish'); // 'publish' | 'whatsapp'
 
   // Modal states
   const [discoveryData, setDiscoveryData] = useState(null); // { user, pages }
@@ -188,23 +190,54 @@ export default function App() {
             onDisconnect={handleDisconnectShop}
           />
 
-          <div className="dashboard-grid">
-            <div className="composer-column">
-              <ShopComposer
-                key={`composer_${currentShopKey}`}
-                shop={activeShop}
-                onPosted={() => setRefreshTrigger(n => n + 1)}
-              />
-            </div>
-
-            <div className="feeds-column">
-              <ShopFeeds
-                key={`feeds_${currentShopKey}`}
-                shop={activeShop}
-                refreshTrigger={refreshTrigger}
-              />
-            </div>
+          {/* Tab Navigation */}
+          <div className="dashboard-tabs">
+            <button
+              type="button"
+              className={`dashboard-tab ${activeTab === 'publish' ? 'dashboard-tab--active' : ''}`}
+              onClick={() => setActiveTab('publish')}
+            >
+              🚀 Publish Content
+            </button>
+            <button
+              type="button"
+              className={`dashboard-tab ${activeTab === 'whatsapp' ? 'dashboard-tab--active' : ''}`}
+              onClick={() => setActiveTab('whatsapp')}
+            >
+              💬 WhatsApp Hub
+            </button>
           </div>
+
+          {/* Publish & Feed View */}
+          {activeTab === 'publish' && (
+            <div className="dashboard-grid">
+              <div className="composer-column">
+                <ShopComposer
+                  key={`composer_${currentShopKey}`}
+                  shop={activeShop}
+                  onPosted={() => setRefreshTrigger(n => n + 1)}
+                />
+              </div>
+
+              <div className="feeds-column">
+                <ShopFeeds
+                  key={`feeds_${currentShopKey}`}
+                  shop={activeShop}
+                  refreshTrigger={refreshTrigger}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* WhatsApp Notification Hub */}
+          {activeTab === 'whatsapp' && (
+            <div className="whatsapp-tab-wrapper">
+              <WhatsAppHub
+                key={`wa_${currentShopKey}`}
+                shop={activeShop}
+              />
+            </div>
+          )}
         </div>
       )}
 
