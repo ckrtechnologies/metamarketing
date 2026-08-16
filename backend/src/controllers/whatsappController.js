@@ -206,10 +206,14 @@ exports.sendViaCloud = async (req, res) => {
     let result;
     if (template.isMetaOfficial || template.metaName) {
       // Official Meta Cloud Template (delivers 100% cold 24/7 to any phone number)
+      const expectedCount = template.paramCount !== undefined ? template.paramCount : 1;
+      const candidateParams = [customer.name, shopName, extraVars.amount || extraVars.offerDetails || ''];
+      const finalParams = candidateParams.slice(0, expectedCount);
+
       const templateConfig = {
         templateName: template.metaName || template.id.replace(/^meta_/, ''),
         languageCode: template.language || 'en',
-        parameters: [customer.name, shopName, extraVars.amount || extraVars.offerDetails || ''].filter(Boolean),
+        parameters: finalParams,
       };
       result = await whatsappService.sendViaCloudAPI(customer.phone, renderedBody, templateConfig);
     } else {

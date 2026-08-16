@@ -20,9 +20,9 @@
       "balanceDue": 1000,
       "notes": "test notes",
       "tags": [],
-      "lastReminder": "2026-08-16T08:37:47.086Z",
+      "lastReminder": "2026-08-16T08:42:50.308Z",
       "createdAt": "2026-08-16T07:10:20.401Z",
-      "updatedAt": "2026-08-16T08:37:47.086Z"
+      "updatedAt": "2026-08-16T08:42:50.309Z"
     },
     {
       "id": "cust_63da267d15b440b8",
@@ -32,9 +32,21 @@
       "balanceDue": 0,
       "notes": "",
       "tags": [],
-      "lastReminder": "2026-08-16T08:39:02.168Z",
+      "lastReminder": "2026-08-16T08:42:51.765Z",
       "createdAt": "2026-08-16T08:27:28.598Z",
-      "updatedAt": "2026-08-16T08:39:02.168Z"
+      "updatedAt": "2026-08-16T08:42:51.766Z"
+    },
+    {
+      "id": "cust_f2bceb377b5544ac",
+      "shopId": "shop_461194823752748",
+      "name": "Shivangi",
+      "phone": "8800696308",
+      "balanceDue": 0,
+      "notes": "",
+      "tags": [],
+      "lastReminder": "2026-08-16T08:41:43.510Z",
+      "createdAt": "2026-08-16T08:41:35.473Z",
+      "updatedAt": "2026-08-16T08:41:43.510Z"
     }
   ]
 }
