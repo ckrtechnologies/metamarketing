@@ -91,5 +91,18 @@
     "isCustom": true,
     "submittedToMeta": false,
     "createdAt": "2026-08-16T08:58:42.840Z"
+  },
+  {
+    "id": "custom_1786873656720_test2",
+    "name": "📢 test2",
+    "category": "promotion",
+    "description": "Custom promotion template",
+    "variables": [
+      "Customer"
+    ],
+    "body": "hello, {{Customer}},\n\nhow are you,\npls clear your bill.",
+    "isCustom": true,
+    "submittedToMeta": true,
+    "createdAt": "2026-08-16T09:47:41.685Z"
   }
 ]

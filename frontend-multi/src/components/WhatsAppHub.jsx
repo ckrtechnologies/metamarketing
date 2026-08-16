@@ -317,13 +317,13 @@ export default function WhatsAppHub({ shop }) {
         body: newTpl.body.trim(),
         icon: newTpl.icon,
         submitToMeta: Boolean(newTpl.submitToMeta),
-      });
+      }, shopId);
 
-      setTemplates(prev => [...prev, created]);
+      loadTemplates();
       setSelectedTemplate(created);
       setShowCreateTplModal(false);
       setNewTpl({ name: '', category: 'promotion', description: '', body: '', icon: '📢', submitToMeta: true });
-      showSuccess(`✅ Template "${created.name}" created!`);
+      showSuccess(`✅ Template "${created.name}" registered and submitted for Meta approval!`);
     } catch (err) {
       setError(err.response?.data?.error || err.message);
     } finally {
