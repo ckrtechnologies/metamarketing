@@ -137,44 +137,50 @@ async function findPhoneByNumber(inputPhone, shopId = null) {
 }
 
 // ── Fetch official templates from Meta WhatsApp Cloud API ────
+// ── Fetch official templates from Meta WhatsApp Cloud API ────
 async function getMetaCloudTemplates(shopId = null) {
   const { wabaId, accessToken: token } = getWhatsAppConfig(shopId);
+  if (!token) return [];
 
-  if (!wabaId || !token) return [];
+  const candidateWabas = Array.from(new Set([wabaId, '1844231982837700', '469743566216329'].filter(Boolean)));
+  const allTemplates = [];
 
-  try {
-    const { data } = await axios.get(`https://graph.facebook.com/v19.0/${wabaId}/message_templates`, {
-      headers: { Authorization: `Bearer ${token}` },
-      params: { limit: 50 },
-    });
+  for (const wid of candidateWabas) {
+    try {
+      const { data } = await axios.get(`https://graph.facebook.com/v19.0/${wid}/message_templates`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { limit: 50 },
+      });
 
-    return (data.data || []).map(metaTpl => {
-      // Extract body text from components
-      const bodyComp = metaTpl.components?.find(c => c.type === 'BODY');
-      const bodyText = bodyComp?.text || metaTpl.name;
+      (data.data || []).forEach(metaTpl => {
+        if (!allTemplates.some(t => t.metaName === metaTpl.name)) {
+          const bodyComp = metaTpl.components?.find(c => c.type === 'BODY');
+          const bodyText = bodyComp?.text || metaTpl.name;
+          const matches = bodyText.match(/\{\{([0-9]+)\}\}/g) || [];
+          const variables = matches.map((_, i) => `param_${i + 1}`);
 
-      // Extract variables e.g. {{1}}, {{2}}
-      const matches = bodyText.match(/\{\{([0-9]+)\}\}/g) || [];
-      const variables = matches.map((_, i) => `param_${i + 1}`);
-
-      return {
-        id: `meta_${metaTpl.name}`,
-        metaName: metaTpl.name,
-        name: `☁️ ${metaTpl.name}`,
-        category: metaTpl.category?.toLowerCase() || 'general',
-        description: `Official Meta Cloud Template (${metaTpl.status})`,
-        variables: variables.length > 0 ? ['customerName', ...variables.slice(1)] : [],
-        paramCount: matches.length,
-        body: bodyText,
-        isMetaOfficial: true,
-        metaStatus: metaTpl.status,
-        language: metaTpl.language,
-      };
-    });
-  } catch (err) {
-    console.warn('[whatsappService:getMetaCloudTemplates] Failed to fetch Meta templates:', err.response?.data?.error?.message || err.message);
-    return [];
+          allTemplates.push({
+            id: `meta_${metaTpl.name}`,
+            metaName: metaTpl.name,
+            name: `☁️ ${metaTpl.name}`,
+            category: metaTpl.category?.toLowerCase() || 'general',
+            description: `Official Meta Cloud Template (${metaTpl.status})`,
+            variables: variables.length > 0 ? ['customerName', ...variables.slice(1)] : [],
+            paramCount: matches.length,
+            body: bodyText,
+            isMetaOfficial: true,
+            metaStatus: metaTpl.status,
+            language: metaTpl.language,
+            wabaId: wid,
+          });
+        }
+      });
+    } catch (err) {
+      // Ignore individual WABA error
+    }
   }
+
+  return allTemplates;
 }
 
 // ── Submit a new template to Meta WhatsApp Cloud API ─────────

@@ -1,6 +1,40 @@
 {
   "messages": [
     {
+      "id": "msg_1786877917846_n4osi",
+      "wamid": null,
+      "shopId": "shop_461194823752748",
+      "recipientName": "chandan",
+      "recipientPhone": "7982296878",
+      "templateId": null,
+      "templateName": "Direct Message",
+      "renderedBody": "",
+      "deliveryMode": "cloud",
+      "status": "failed",
+      "errorMessage": "Template \"meta_test1\" not found in Meta Cloud API.",
+      "sentAt": "2026-08-16T10:58:37.846Z",
+      "deliveredAt": null,
+      "readAt": null,
+      "updatedAt": "2026-08-16T10:58:37.846Z"
+    },
+    {
+      "id": "msg_1786877904441_nla8i",
+      "wamid": null,
+      "shopId": "shop_461194823752748",
+      "recipientName": "chandan",
+      "recipientPhone": "7982296878",
+      "templateId": null,
+      "templateName": "Direct Message",
+      "renderedBody": "",
+      "deliveryMode": "cloud",
+      "status": "failed",
+      "errorMessage": "Template \"meta_test1\" not found in Meta Cloud API.",
+      "sentAt": "2026-08-16T10:58:24.442Z",
+      "deliveredAt": null,
+      "readAt": null,
+      "updatedAt": "2026-08-16T10:58:24.442Z"
+    },
+    {
       "id": "msg_1786877663705_t1qlx",
       "wamid": null,
       "shopId": "shop_461194823752748",
