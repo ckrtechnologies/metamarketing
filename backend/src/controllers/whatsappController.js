@@ -208,11 +208,10 @@ exports.sendViaCloud = async (req, res) => {
       // Official Meta Cloud Template (delivers 100% cold 24/7 to any phone number)
       const expectedCount = template.paramCount !== undefined ? template.paramCount : 0;
       const candidateParams = [
-        customer.name || 'Customer',
-        shopName || 'Shop',
-        extraVars.amount || (customer.balanceDue > 0 ? String(customer.balanceDue) : '0'),
-        extraVars.dueDate || extraVars.validTill || 'today',
-        extraVars.offerDetails || extraVars.discountPercent || '',
+        extraVars.param_1 || extraVars.customerName || customer.name || 'Customer',
+        extraVars.param_2 || extraVars.offerDetails || extraVars.amount || shopName || 'Shop',
+        extraVars.param_3 || extraVars.dueDate || extraVars.amount || extraVars.validTill || 'today',
+        extraVars.param_4 || extraVars.dueDate || extraVars.validTill || '',
       ];
 
       // Fill in exactly expectedCount items

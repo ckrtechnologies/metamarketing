@@ -166,7 +166,15 @@ function saveTemplates(templates) {
 
 async function getTemplate(templateId) {
   const templates = await getAllTemplates();
-  const tpl = templates.find(t => t.id === templateId);
+  const clean = String(templateId || '').toLowerCase().replace(/^meta_/, '');
+  const tpl = templates.find(t =>
+    t.id === templateId ||
+    t.metaName === templateId ||
+    t.metaName === clean ||
+    t.id === `meta_${clean}` ||
+    t.id.toLowerCase().includes(`_${clean}`) ||
+    t.name.toLowerCase().includes(clean)
+  );
   if (!tpl) throw new Error(`Template "${templateId}" not found.`);
   return tpl;
 }
@@ -224,14 +232,24 @@ function deleteTemplate(templateId) {
 }
 
 // ── Template Rendering ────────────────────────────────────────
-// Replaces {{variableName}} placeholders with actual values
+// Replaces {{variableName}} and {{1}}, {{2}} placeholders with actual values
 function renderTemplate(template, vars = {}) {
   let body = template.body;
 
-  // Auto-inject shopName and customerName from context if not provided in vars
-  for (const [key, value] of Object.entries(vars)) {
-    const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
-    body = body.replace(regex, value || '');
+  // Build combined lookup for both named and positional parameters
+  const lookup = {
+    '1': vars.customerName || vars.param_1 || 'Customer',
+    '2': vars.param_2 || vars.offerDetails || vars.amount || vars.shopName || '',
+    '3': vars.param_3 || vars.dueDate || vars.amount || vars.shopName || '',
+    '4': vars.param_4 || vars.dueDate || vars.validTill || '',
+    ...vars,
+  };
+
+  for (const [key, value] of Object.entries(lookup)) {
+    if (value !== undefined && value !== null) {
+      const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'gi');
+      body = body.replace(regex, String(value));
+    }
   }
 
   // Warn about any un-filled placeholders
