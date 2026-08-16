@@ -206,9 +206,20 @@ exports.sendViaCloud = async (req, res) => {
     let result;
     if (template.isMetaOfficial || template.metaName) {
       // Official Meta Cloud Template (delivers 100% cold 24/7 to any phone number)
-      const expectedCount = template.paramCount !== undefined ? template.paramCount : 1;
-      const candidateParams = [customer.name, shopName, extraVars.amount || extraVars.offerDetails || ''];
+      const expectedCount = template.paramCount !== undefined ? template.paramCount : 0;
+      const candidateParams = [
+        customer.name || 'Customer',
+        shopName || 'Shop',
+        extraVars.amount || (customer.balanceDue > 0 ? String(customer.balanceDue) : '0'),
+        extraVars.dueDate || extraVars.validTill || 'today',
+        extraVars.offerDetails || extraVars.discountPercent || '',
+      ];
+
+      // Fill in exactly expectedCount items
       const finalParams = candidateParams.slice(0, expectedCount);
+      while (finalParams.length < expectedCount) {
+        finalParams.push(`Value ${finalParams.length + 1}`);
+      }
 
       const templateConfig = {
         templateName: template.metaName || template.id.replace(/^meta_/, ''),

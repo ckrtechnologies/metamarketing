@@ -20,9 +20,9 @@
       "balanceDue": 1000,
       "notes": "test notes",
       "tags": [],
-      "lastReminder": "2026-08-16T08:44:30.673Z",
+      "lastReminder": "2026-08-16T08:53:22.189Z",
       "createdAt": "2026-08-16T07:10:20.401Z",
-      "updatedAt": "2026-08-16T08:44:30.673Z"
+      "updatedAt": "2026-08-16T08:53:22.189Z"
     },
     {
       "id": "cust_63da267d15b440b8",
@@ -32,9 +32,9 @@
       "balanceDue": 0,
       "notes": "",
       "tags": [],
-      "lastReminder": "2026-08-16T08:46:50.681Z",
+      "lastReminder": "2026-08-16T08:53:23.506Z",
       "createdAt": "2026-08-16T08:27:28.598Z",
-      "updatedAt": "2026-08-16T08:46:50.681Z"
+      "updatedAt": "2026-08-16T08:53:23.506Z"
     },
     {
       "id": "cust_f2bceb377b5544ac",
@@ -44,9 +44,9 @@
       "balanceDue": 0,
       "notes": "",
       "tags": [],
-      "lastReminder": "2026-08-16T08:44:34.502Z",
+      "lastReminder": "2026-08-16T08:51:32.798Z",
       "createdAt": "2026-08-16T08:41:35.473Z",
-      "updatedAt": "2026-08-16T08:44:34.502Z"
+      "updatedAt": "2026-08-16T08:51:32.798Z"
     }
   ]
 }
