@@ -203,8 +203,19 @@ exports.sendViaCloud = async (req, res) => {
       ...extraVars,
     });
 
-    // Send the actual rendered message text directly to the customer
-    const result = await whatsappService.sendViaCloudAPI(customer.phone, renderedBody, null);
+    let result;
+    if (template.isMetaOfficial || template.metaName) {
+      // Official Meta Cloud Template (delivers 100% cold 24/7 to any phone number)
+      const templateConfig = {
+        templateName: template.metaName || template.id.replace(/^meta_/, ''),
+        languageCode: template.language || 'en',
+        parameters: [customer.name, shopName, extraVars.amount || extraVars.offerDetails || ''].filter(Boolean),
+      };
+      result = await whatsappService.sendViaCloudAPI(customer.phone, renderedBody, templateConfig);
+    } else {
+      // Freeform rendered text message
+      result = await whatsappService.sendViaCloudAPI(customer.phone, renderedBody, null);
+    }
 
     customerRepo.recordReminderSent(shopId, customerId);
     console.log(`[whatsapp:cloud] Message sent to "${customer.name}" (${customer.phone}) - shop ${shopId}`);
