@@ -484,11 +484,7 @@ export default function WhatsAppHub({ shop }) {
                 type="button"
                 className="wa-btn-reconnect"
                 onClick={() => {
-                  setCustomCreds({
-                    phoneNumberId: waStatus.phoneNumberId || '',
-                    wabaId: waStatus.wabaId || '',
-                    accessToken: '',
-                  });
+                  setPhoneInput('');
                   setShowConnectModal(true);
                 }}
                 disabled={loading.oauth}
@@ -509,7 +505,7 @@ export default function WhatsAppHub({ shop }) {
               type="button"
               className="wa-btn-connect-oauth"
               onClick={() => {
-                setCustomCreds({ phoneNumberId: '', wabaId: '', accessToken: '' });
+                setPhoneInput('');
                 setShowConnectModal(true);
               }}
               disabled={loading.oauth}
