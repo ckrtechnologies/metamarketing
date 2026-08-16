@@ -34,6 +34,41 @@
         "accessToken": "EAANZBQCrNrfsBSEZBZC945SLeW6Y1XN5JTkis1zgCpmFO85wUQEx2p4NZCBNnmUISsRfHWeaZAWocZCnLioENNJNLzGiowhu7og7DiUAxzcZBKzyNxLTqvfEzb897YEbzZCXTo2xvRuNgHMuFZB6TF3UZBCgL0VdMwc4ZClgE5FjlAIroxxEw2P0LlsZBxjiZCq7xHgZDZD",
         "connectedAt": "2026-08-16T11:33:58.573Z"
       }
+    },
+    {
+      "id": "shop_102575931769350",
+      "createdAt": "2026-08-16T11:43:45.030Z",
+      "updatedAt": "2026-08-16T14:32:48.811Z",
+      "shopName": "Arun J Sharma",
+      "ownerName": "Chandan Mallik",
+      "ownerEmail": "",
+      "ownerMetaUserId": "984330234649917",
+      "facebook": {
+        "pageId": "102575931769350",
+        "pageName": "Arun J Sharma",
+        "pageAccessToken": "EAAXPZCkmpe14BSNNka69EmdSpgBC5yhSOMmwryrmPDJDktWDfcwyYoGnEhbTWlWgKKzfigZCvO7RVacNJf1KAGcZBQU0aL5p3ZC6RV7nd3bzsXE6bmPZAE9ZC73xJnMETXamTgXMN7EFoE8XbzR8FpU44pQtWVmNtFDOPViZBBa7mZAq9yBhFLrGJIMldymp5Ljskq0ZD",
+        "fanCount": 3797,
+        "pictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t39.30808-1/662300281_1588133806647524_2474772548955042479_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=108&ccb=1-7&_nc_sid=f907e8&_nc_ohc=uvJuCgh-BZUQ7kNvwEDaAbT&_nc_oc=AdqVIEbKPNwa0enE8E69g5D7lJwCAZlVY054EyUCHp04F4_eS9ZLp15bePFzTP2S9PE&_nc_zt=24&_nc_ht=scontent.fdel31-1.fna&edm=AJdBtusEAAAA&_nc_gid=5iHLhiI_3sw6AUx641jhYQ&_nc_tpa=Q5bMBQLXxGh_hWd1T0zeKctSaYAb6GiZXUbWxL-34u6rVPiOlEaoALA5_c00QnJ1nqxyXHhg1N0K65XQSQ&oh=00_AQENp-VltzKJiRUCNb9iY5ck1GfM18n80D6orJsO4PLZqg&oe=6A8781AD"
+      },
+      "instagram": {
+        "igUserId": "17841447873515878",
+        "username": "arun_j_sharma",
+        "name": "Arun Sharma",
+        "profilePictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t51.82787-15/660065051_18086001473595784_5323363112444061946_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=7d201b&_nc_ohc=UB9ap85IPIcQ7kNvwHEzgQe&_nc_oc=AdrOCFLHJBn4o92MOveFGHSdk7UrD9N6M389UFs1npRWvbhg0objkdwM-kO08l4e3Ts&_nc_zt=23&_nc_ht=scontent.fdel31-1.fna&edm=AL-3X8kEAAAA&_nc_gid=bZoDShFZpY_7jTY7fnJN-Q&oh=00_AQHKN9UTaLjEI735et6GZKYJJ3T10kr8DVy0l4-KUm0iPg&oe=6A87A21B",
+        "followersCount": 202441,
+        "mediaCount": 841
+      },
+      "status": "active",
+      "whatsapp": {
+        "connected": true,
+        "wabaId": "1844231982837700",
+        "phoneNumberId": "1076671092207220",
+        "displayPhoneNumber": "+91 89209 32354",
+        "verifiedName": "Stenna",
+        "qualityRating": "GREEN",
+        "accessToken": "EAANZBQCrNrfsBSEZBZC945SLeW6Y1XN5JTkis1zgCpmFO85wUQEx2p4NZCBNnmUISsRfHWeaZAWocZCnLioENNJNLzGiowhu7og7DiUAxzcZBKzyNxLTqvfEzb897YEbzZCXTo2xvRuNgHMuFZB6TF3UZBCgL0VdMwc4ZClgE5FjlAIroxxEw2P0LlsZBxjiZCq7xHgZDZD",
+        "connectedAt": "2026-08-16T11:44:03.084Z"
+      }
     }
   ]
 }

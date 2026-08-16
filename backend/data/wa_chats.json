@@ -76,6 +76,38 @@
       ],
       "createdAt": "2026-08-16T11:34:45.000Z",
       "updatedAt": "2026-08-16T11:42:08.042Z"
+    },
+    "shop_102575931769350_8860573804": {
+      "id": "shop_102575931769350_8860573804",
+      "shopId": "shop_102575931769350",
+      "customerPhone": "8860573804",
+      "customerName": "chandan",
+      "unreadCount": 0,
+      "lastMessage": "Thank you! We received your message.",
+      "lastMessageAt": "2026-08-16T11:44:53.103Z",
+      "lastInboundAt": null,
+      "messages": [
+        {
+          "id": "msg_out_1786880678701_h34m",
+          "wamid": "wamid.HBgMOTE4ODYwNTczODA0FQIAERgSMkQ5Rjc2MEMxMzBDOTVEQTgwAA==",
+          "direction": "outbound",
+          "text": "hello",
+          "templateName": null,
+          "status": "sent",
+          "timestamp": "2026-08-16T11:44:38.701Z"
+        },
+        {
+          "id": "msg_out_1786880693103_iab4",
+          "wamid": "wamid.HBgMOTE4ODYwNTczODA0FQIAERgSQUVDMkY3NzlEQjlENTREM0EwAA==",
+          "direction": "outbound",
+          "text": "Thank you! We received your message.",
+          "templateName": null,
+          "status": "sent",
+          "timestamp": "2026-08-16T11:44:53.103Z"
+        }
+      ],
+      "createdAt": "2026-08-16T11:44:38.701Z",
+      "updatedAt": "2026-08-16T11:44:53.103Z"
     }
   }
 }

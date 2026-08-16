@@ -71,6 +71,18 @@
       "lastReminder": "2026-08-16T11:22:10.065Z",
       "createdAt": "2026-08-16T11:07:09.557Z",
       "updatedAt": "2026-08-16T11:22:10.065Z"
+    },
+    {
+      "id": "cust_193281e8ff7647aa",
+      "shopId": "shop_102575931769350",
+      "name": "chandan",
+      "phone": "8860573804",
+      "balanceDue": 0,
+      "notes": "",
+      "tags": [],
+      "lastReminder": "2026-08-16T14:33:24.210Z",
+      "createdAt": "2026-08-16T11:44:13.791Z",
+      "updatedAt": "2026-08-16T14:33:24.210Z"
     }
   ]
 }
