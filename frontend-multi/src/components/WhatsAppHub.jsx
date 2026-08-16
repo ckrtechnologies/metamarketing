@@ -4,7 +4,7 @@ import {
   getCustomers, addCustomer,
   updateCustomer, deleteCustomer, generateWALink,
   generateBulkLinks, sendViaCloud,
-  getWhatsAppStatus, connectWhatsAppOAuth, disconnectWhatsApp,
+  getWhatsAppStatus, getAvailableWhatsAppNumbers, connectWhatsAppOAuth, disconnectWhatsApp,
 } from '../api/whatsapp';
 import './WhatsAppHub.css';
 
@@ -62,14 +62,11 @@ export default function WhatsAppHub({ shop }) {
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [newCustomer, setNewCustomer] = useState({ name: '', phone: '', balanceDue: '', notes: '' });
 
-  // WhatsApp Connection & OAuth State
+  // WhatsApp Connection & Phone Number State
   const [waStatus, setWaStatus] = useState({ connected: false, loading: true });
   const [showConnectModal, setShowConnectModal] = useState(false);
-  const [customCreds, setCustomCreds] = useState({
-    phoneNumberId: '',
-    wabaId: '',
-    accessToken: '',
-  });
+  const [availableNumbers, setAvailableNumbers] = useState([]);
+  const [phoneInput, setPhoneInput] = useState('');
   const embeddedSessionRef = useRef({ wabaId: null, phoneNumberId: null });
 
   // Template creation modal state
@@ -106,6 +103,10 @@ export default function WhatsAppHub({ shop }) {
     getWhatsAppStatus(shopId)
       .then(data => setWaStatus({ ...data, loading: false }))
       .catch(() => setWaStatus({ connected: false, loading: false }));
+
+    getAvailableWhatsAppNumbers(shopId)
+      .then(setAvailableNumbers)
+      .catch(() => setAvailableNumbers([]));
   }, [shopId]);
 
   useEffect(() => {
@@ -139,21 +140,23 @@ export default function WhatsAppHub({ shop }) {
     return () => window.removeEventListener('message', handleMetaMessage);
   }, []);
 
-  // ── Connect / Switch WhatsApp Number Directly ───────────────
-  async function handleSaveCustomCreds(e) {
-    e.preventDefault();
-    if (!customCreds.phoneNumberId.trim()) return alert('Please enter a Phone Number ID.');
+  // ── Connect / Switch WhatsApp Number by plain phone number ───
+  async function handleConnectPhoneNumber(e, selectedNum = null) {
+    if (e) e.preventDefault();
+    const phoneToConnect = selectedNum?.displayPhoneNumber || selectedNum?.phoneNumberId || phoneInput.trim();
+    if (!phoneToConnect) return alert('Please enter or select a phone number.');
 
     setLoading(l => ({ ...l, oauth: true }));
     setError(null);
     try {
       await connectWhatsAppOAuth(shopId, {
-        phoneNumberId: customCreds.phoneNumberId.trim(),
-        wabaId: customCreds.wabaId.trim() || undefined,
-        accessToken: customCreds.accessToken.trim() || undefined,
+        phoneNumber: phoneToConnect,
+        phoneNumberId: selectedNum?.phoneNumberId,
+        wabaId: selectedNum?.wabaId,
       });
-      showSuccess(`🎉 WhatsApp Number connected for ${shopName}!`);
+      showSuccess(`🎉 WhatsApp Number ${selectedNum?.displayPhoneNumber || phoneToConnect} connected for ${shopName}!`);
       setShowConnectModal(false);
+      setPhoneInput('');
       loadStatus();
       loadTemplates();
     } catch (err) {
@@ -1019,59 +1022,67 @@ export default function WhatsAppHub({ shop }) {
               </button>
             </div>
 
-            <form onSubmit={handleSaveCustomCreds} className="wa-modal-form">
-              <div className="wa-modal-field">
-                <label className="wa-var-label">Phone Number ID *</label>
-                <input
-                  type="text"
-                  className="wa-form-input"
-                  placeholder="e.g. 443930708804530"
-                  value={customCreds.phoneNumberId}
-                  onChange={e => setCustomCreds(p => ({ ...p, phoneNumberId: e.target.value }))}
-                  required
-                />
-                <span className="wa-tag-hint">Find this in WhatsApp Manager &gt; Phone Numbers &gt; Settings</span>
-              </div>
+            <div className="wa-modal-form">
+              {availableNumbers.length > 0 && (
+                <div className="wa-modal-field">
+                  <label className="wa-var-label">Select from your verified WhatsApp Business Numbers</label>
+                  <div className="wa-avail-numbers-list">
+                    {availableNumbers.map(num => (
+                      <button
+                        key={num.phoneNumberId}
+                        type="button"
+                        className={`wa-avail-num-card ${waStatus.phoneNumberId === num.phoneNumberId ? 'wa-avail-num-card--active' : ''}`}
+                        onClick={(e) => handleConnectPhoneNumber(e, num)}
+                        disabled={loading.oauth}
+                      >
+                        <div className="wa-avail-num-main">
+                          <span className="wa-avail-num-phone">📱 {num.displayPhoneNumber}</span>
+                          <span className="wa-avail-num-name">{num.verifiedName || 'WhatsApp Business'}</span>
+                        </div>
+                        <div className="wa-avail-num-meta">
+                          <span className="wa-avail-num-badge">
+                            {waStatus.phoneNumberId === num.phoneNumberId ? 'Active Now' : '⚡ Click to Connect'}
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-              <div className="wa-modal-field">
-                <label className="wa-var-label">WhatsApp Business Account ID (WABA ID)</label>
-                <input
-                  type="text"
-                  className="wa-form-input"
-                  placeholder="e.g. 469743566216329"
-                  value={customCreds.wabaId}
-                  onChange={e => setCustomCreds(p => ({ ...p, wabaId: e.target.value }))}
-                />
-              </div>
-
-              <div className="wa-modal-field">
-                <label className="wa-var-label">Access Token (optional if already configured)</label>
-                <input
-                  type="password"
-                  className="wa-form-input"
-                  placeholder="Leave empty to use active server token"
-                  value={customCreds.accessToken}
-                  onChange={e => setCustomCreds(p => ({ ...p, accessToken: e.target.value }))}
-                />
-              </div>
+              <form onSubmit={handleConnectPhoneNumber} className="wa-modal-manual-phone">
+                <div className="wa-modal-field">
+                  <label className="wa-var-label">Or enter your WhatsApp Mobile Number</label>
+                  <div className="wa-phone-input-row">
+                    <input
+                      type="tel"
+                      className="wa-form-input"
+                      placeholder="e.g. 7814051127 or +91 78140 51127"
+                      value={phoneInput}
+                      onChange={e => setPhoneInput(e.target.value)}
+                    />
+                    <button
+                      type="submit"
+                      className="wa-cta-btn wa-cta-btn--bulk"
+                      disabled={loading.oauth || !phoneInput.trim()}
+                    >
+                      {loading.oauth ? '⏳ Connecting…' : '⚡ Connect'}
+                    </button>
+                  </div>
+                  <span className="wa-tag-hint">The system automatically discovers and links your official Meta WhatsApp Business account.</span>
+                </div>
+              </form>
 
               <div className="wa-modal-actions">
-                <button
-                  type="submit"
-                  className="wa-cta-btn wa-cta-btn--bulk"
-                  disabled={loading.oauth}
-                >
-                  {loading.oauth ? '⏳ Verifying with Meta…' : '✅ Link & Verify Number'}
-                </button>
                 <button
                   type="button"
                   className="wa-form-cancel-btn"
                   onClick={() => setShowConnectModal(false)}
                 >
-                  Cancel
+                  Close
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}

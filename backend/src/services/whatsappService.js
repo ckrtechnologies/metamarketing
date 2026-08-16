@@ -52,35 +52,64 @@ async function exchangeCodeForWhatsAppToken(code) {
   return data; // { access_token, token_type, expires_in }
 }
 
-// ── OAuth: Fetch Live Phone Number Details ────────────────────
-async function fetchWhatsAppPhoneDetails(phoneNumberId, accessToken) {
-  const { data } = await axios.get(`https://graph.facebook.com/v19.0/${phoneNumberId}`, {
-    params: {
-      fields: 'display_phone_number,verified_name,quality_rating,name_status,status',
-    },
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+// ── List all available WhatsApp phone numbers from Meta ────────
+async function getAvailableWhatsAppNumbers(shopId = null) {
+  const { wabaId, accessToken: token } = getWhatsAppConfig(shopId);
+  const candidateWabas = Array.from(new Set([wabaId, '469743566216329', '1844231982837700'].filter(Boolean)));
+  const numbers = [];
 
-  return data;
+  for (const wid of candidateWabas) {
+    try {
+      const { data } = await axios.get(`https://graph.facebook.com/v19.0/${wid}/phone_numbers`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { fields: 'id,display_phone_number,verified_name,quality_rating,name_status,status' },
+      });
+      (data.data || []).forEach(p => {
+        if (!numbers.some(n => n.id === p.id)) {
+          numbers.push({
+            phoneNumberId: p.id,
+            wabaId: wid,
+            displayPhoneNumber: p.display_phone_number,
+            verifiedName: p.verified_name,
+            qualityRating: p.quality_rating,
+            nameStatus: p.name_status,
+            status: p.status,
+          });
+        }
+      });
+    } catch (e) {
+      // Ignore individual WABA query errors
+    }
+  }
+
+  return numbers;
 }
 
-// ── OAuth: Subscribe app to shop's WABA webhooks ──────────────
-async function subscribeWABAApp(wabaId, accessToken) {
-  try {
-    const { data } = await axios.post(
-      `https://graph.facebook.com/v19.0/${wabaId}/subscribed_apps`,
-      {},
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }
-    );
-    return data;
-  } catch (err) {
-    console.warn(`[whatsappService:subscribeWABAApp] Subscription notice:`, err.response?.data?.error?.message || err.message);
-    return null;
+// ── Lookup a phone by plain user-entered number (e.g. 7814051127) ──
+async function findPhoneByNumber(inputPhone, shopId = null) {
+  const cleanInput = String(inputPhone || '').replace(/[^0-9]/g, '').slice(-10);
+  if (!cleanInput) throw new Error('Please enter a valid phone number.');
+
+  const available = await getAvailableWhatsAppNumbers(shopId);
+  const match = available.find(p => (p.displayPhoneNumber || '').replace(/[^0-9]/g, '').slice(-10) === cleanInput);
+
+  if (!match) {
+    // If exact match not in list, check if user passed phone ID directly
+    if (inputPhone.length > 12 && /^\d+$/.test(inputPhone)) {
+      const { accessToken: token } = getWhatsAppConfig(shopId);
+      const direct = await fetchWhatsAppPhoneDetails(inputPhone, token);
+      return {
+        phoneNumberId: inputPhone,
+        wabaId: process.env.WHATSAPP_BUSINESS_ACCOUNT_ID,
+        displayPhoneNumber: direct.display_phone_number,
+        verifiedName: direct.verified_name,
+        qualityRating: direct.quality_rating,
+      };
+    }
+    throw new Error(`Phone number ending in ${cleanInput} was not found on your WhatsApp Business Account.`);
   }
+
+  return match;
 }
 
 // ── Fetch official templates from Meta WhatsApp Cloud API ────
@@ -379,9 +408,9 @@ function generateBulkWALinks(customers, template, extraVars = {}) {
 
 module.exports = {
   getWhatsAppConfig,
+  getAvailableWhatsAppNumbers,
+  findPhoneByNumber,
   exchangeCodeForWhatsAppToken,
-  fetchWhatsAppPhoneDetails,
-  subscribeWABAApp,
   getAllTemplates,
   getTemplate,
   createTemplate,

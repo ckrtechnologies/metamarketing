@@ -5,6 +5,7 @@ const router = express.Router();
 
 // ── OAuth & Shop Connection (Embedded Signup) ─────────────────
 router.get('/status', whatsappController.getWhatsAppStatus);
+router.get('/available-numbers', whatsappController.getAvailableNumbers);
 router.post('/oauth/callback', whatsappController.connectWhatsAppOAuth);
 router.post('/oauth/disconnect', whatsappController.disconnectWhatsApp);
 

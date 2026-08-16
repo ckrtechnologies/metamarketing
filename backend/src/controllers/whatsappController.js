@@ -17,16 +17,25 @@ function formatError(err) {
 }
 
 // ── POST /api/v2/whatsapp/oauth/callback ───────────────────────
-// Embedded Signup Callback: Exchanges code for token & registers shop's WABA
+// ── GET /api/v2/whatsapp/available-numbers ───────────────────
+exports.getAvailableNumbers = async (req, res) => {
+  try {
+    const shopId = getShopId(req);
+    const numbers = await whatsappService.getAvailableWhatsAppNumbers(shopId);
+    res.json({ success: true, data: numbers });
+  } catch (err) {
+    const f = formatError(err);
+    res.status(500).json({ success: false, error: f.message, code: f.code });
+  }
+};
+
+// ── Connect WhatsApp Number by selecting or typing plain phone number ──
 exports.connectWhatsAppOAuth = async (req, res) => {
   try {
     const shopId = getShopId(req);
-    const { code, wabaId, phoneNumberId, accessToken: providedToken } = req.body;
+    const { code, wabaId, phoneNumberId, phoneNumber, phone, accessToken: providedToken } = req.body;
 
     if (!shopId) return res.status(400).json({ success: false, error: 'Shop ID is required.', code: 'MISSING_SHOP_ID' });
-    if (!code && !providedToken && !phoneNumberId) {
-      return res.status(400).json({ success: false, error: 'Phone Number ID or Auth Code is required.', code: 'MISSING_PARAMS' });
-    }
 
     const shop = shopRepo.findShopById(shopId);
     if (!shop) return res.status(404).json({ success: false, error: 'Shop not found.', code: 'SHOP_NOT_FOUND' });
@@ -37,29 +46,45 @@ exports.connectWhatsAppOAuth = async (req, res) => {
       accessToken = tokenData.access_token;
     }
 
-    // Fetch live Phone Number metadata from Meta
+    let resolvedPhoneId = phoneNumberId;
+    let resolvedWabaId = wabaId;
     let phoneMeta = {};
-    const targetPhoneId = phoneNumberId || process.env.WHATSAPP_PHONE_NUMBER_ID;
-    if (targetPhoneId && accessToken) {
+
+    const inputNumber = phoneNumber || phone;
+    if (inputNumber) {
+      // Automatically resolve Phone Number ID and WABA ID from plain phone number!
+      const matched = await whatsappService.findPhoneByNumber(inputNumber, shopId);
+      resolvedPhoneId = matched.phoneNumberId;
+      resolvedWabaId = matched.wabaId || wabaId;
+      phoneMeta = {
+        display_phone_number: matched.displayPhoneNumber,
+        verified_name: matched.verifiedName,
+        quality_rating: matched.qualityRating,
+      };
+    } else if (resolvedPhoneId) {
       try {
-        phoneMeta = await whatsappService.fetchWhatsAppPhoneDetails(targetPhoneId, accessToken);
-      } catch (phoneErr) {
-        console.warn('[whatsapp:oauth] Could not fetch phone details:', phoneErr.response?.data?.error?.message || phoneErr.message);
+        const available = await whatsappService.getAvailableWhatsAppNumbers(shopId);
+        const match = available.find(p => p.phoneNumberId === resolvedPhoneId);
+        if (match) {
+          resolvedWabaId = match.wabaId || resolvedWabaId;
+          phoneMeta = {
+            display_phone_number: match.displayPhoneNumber,
+            verified_name: match.verifiedName,
+            quality_rating: match.qualityRating,
+          };
+        }
+      } catch (e) {
+        // Fallback
       }
     }
 
-    // 3. Subscribe our app to the shop's WABA webhooks
-    if (wabaId) {
-      await whatsappService.subscribeWABAApp(wabaId, accessToken);
-    }
-
-    // 4. Save credentials to shop repository (shops.json)
+    // Save to shop repository (shops.json)
     const updatedShop = shopRepo.upsertShop({
       ...shop,
       whatsapp: {
         connected: true,
-        wabaId: wabaId || null,
-        phoneNumberId: phoneNumberId || null,
+        wabaId: resolvedWabaId || null,
+        phoneNumberId: resolvedPhoneId || null,
         displayPhoneNumber: phoneMeta.display_phone_number || null,
         verifiedName: phoneMeta.verified_name || shop.shopName,
         qualityRating: phoneMeta.quality_rating || 'UNKNOWN',
@@ -68,11 +93,18 @@ exports.connectWhatsAppOAuth = async (req, res) => {
       },
     });
 
-    console.log(`[whatsapp:oauth] ✅ WhatsApp connected for shop "${shop.shopName}" -> Phone: ${phoneMeta.display_phone_number || phoneNumberId}`);
+    console.log(`[whatsapp:oauth] ✅ WhatsApp connected for shop "${shop.shopName}" -> Phone: ${phoneMeta.display_phone_number || resolvedPhoneId}`);
     res.json({
       success: true,
       message: `WhatsApp Business connected successfully for ${shop.shopName}!`,
       shop: updatedShop,
+      data: {
+        connected: true,
+        displayPhoneNumber: phoneMeta.display_phone_number,
+        verifiedName: phoneMeta.verified_name,
+        phoneNumberId: resolvedPhoneId,
+        wabaId: resolvedWabaId,
+      },
     });
   } catch (err) {
     const f = formatError(err);

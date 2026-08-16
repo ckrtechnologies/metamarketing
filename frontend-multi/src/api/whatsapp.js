@@ -6,8 +6,13 @@ export const getWhatsAppStatus = (shopId) =>
     headers: { 'x-shop-id': shopId },
   }).then(r => r.data.data);
 
-export const connectWhatsAppOAuth = (shopId, { code, wabaId, phoneNumberId }) =>
-  api.post('/v2/whatsapp/oauth/callback', { code, wabaId, phoneNumberId }, {
+export const getAvailableWhatsAppNumbers = (shopId) =>
+  api.get('/v2/whatsapp/available-numbers', {
+    headers: { 'x-shop-id': shopId },
+  }).then(r => r.data.data);
+
+export const connectWhatsAppOAuth = (shopId, payload) =>
+  api.post('/v2/whatsapp/oauth/callback', payload, {
     headers: { 'x-shop-id': shopId },
   }).then(r => r.data);
 
