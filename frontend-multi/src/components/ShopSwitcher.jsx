@@ -1,55 +1,113 @@
 import './ShopSwitcher.css';
 
-export default function ShopSwitcher({ shops, activeShopId, onSelectShop, onAddNewShop, onClose }) {
+export default function ShopSwitcher({ shops, activeShopId, onSelectShop, onAddNewShop, onClose, onDeleteShop }) {
   return (
-    <div className="modal-backdrop">
-      <div className="modal-card switcher-card">
-        <div className="modal-header">
-          <div>
-            <h2 className="modal-title">Switch Shop Profile</h2>
-            <p className="modal-subtitle">Select which connected shop to manage or connect a new shopkeeper.</p>
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal-card switcher-card" onClick={e => e.stopPropagation()}>
+        {/* Header */}
+        <div className="switcher-header">
+          <div className="switcher-header-left">
+            <div className="switcher-icon-wrap">
+              <span className="switcher-main-icon">🏬</span>
+            </div>
+            <div>
+              <h2 className="switcher-title">Switch Shop Profile</h2>
+              <p className="switcher-subtitle">
+                Select a connected business to manage or connect a new shopkeeper.
+              </p>
+            </div>
           </div>
-          <button type="button" className="modal-close" onClick={onClose}>
+          <button type="button" className="switcher-close-btn" onClick={onClose} title="Close modal">
             ✕
           </button>
         </div>
 
-        <div className="switcher-list">
-          {shops.map(shop => {
-            const isActive = shop.id === activeShopId;
-            return (
-              <div
-                key={shop.id}
-                className={`switcher-item ${isActive ? 'switcher-item--active' : ''}`}
-                onClick={() => onSelectShop(shop.id)}
-              >
-                <img
-                  src={shop.facebook?.pictureUrl || 'https://via.placeholder.com/44'}
-                  alt=""
-                  className="switcher-avatar"
-                />
-                <div className="switcher-info">
-                  <div className="switcher-name-row">
-                    <span className="switcher-name">{shop.shopName}</span>
-                    {isActive && <span className="active-badge">Active</span>}
+        {/* Shop List */}
+        <div className="switcher-body">
+          <div className="switcher-section-title">
+            <span>CONNECTED SHOPS ({shops.length})</span>
+          </div>
+
+          <div className="switcher-list">
+            {shops.map(shop => {
+              const isActive = shop.id === activeShopId;
+              const hasFb = Boolean(shop.facebook?.pageName);
+              const hasIg = Boolean(shop.instagram?.username);
+
+              return (
+                <div
+                  key={shop.id}
+                  className={`switcher-item ${isActive ? 'switcher-item--active' : ''}`}
+                  onClick={() => onSelectShop(shop.id)}
+                >
+                  {/* Avatar */}
+                  <div className="switcher-avatar-wrap">
+                    {shop.facebook?.pictureUrl ? (
+                      <img
+                        src={shop.facebook.pictureUrl}
+                        alt={shop.shopName}
+                        className="switcher-avatar"
+                      />
+                    ) : (
+                      <div className="switcher-avatar-fallback">🏬</div>
+                    )}
+                    {isActive && <span className="switcher-online-dot" title="Currently Active" />}
                   </div>
-                  <span className="switcher-meta">
-                    📘 {shop.facebook?.pageName} {shop.instagram && `· 📸 @${shop.instagram.username}`}
-                  </span>
+
+                  {/* Details */}
+                  <div className="switcher-info">
+                    <div className="switcher-name-row">
+                      <span className="switcher-name">{shop.shopName}</span>
+                      {isActive ? (
+                        <span className="active-pill">
+                          <span className="active-pill-dot" /> Active
+                        </span>
+                      ) : (
+                        <span className="merchant-label">Owner: {shop.ownerName || 'Merchant'}</span>
+                      )}
+                    </div>
+
+                    <div className="switcher-badges-row">
+                      {hasFb && (
+                        <span className="switcher-badge switcher-badge--fb">
+                          📘 {shop.facebook.pageName}
+                          {shop.facebook.fanCount ? ` (${shop.facebook.fanCount.toLocaleString()})` : ''}
+                        </span>
+                      )}
+                      {hasIg ? (
+                        <span className="switcher-badge switcher-badge--ig">
+                          📸 @{shop.instagram.username}
+                          {shop.instagram.followersCount ? ` (${shop.instagram.followersCount.toLocaleString()})` : ''}
+                        </span>
+                      ) : (
+                        <span className="switcher-badge switcher-badge--muted">📸 No IG</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Action Indicator */}
+                  <div className="switcher-action-wrap">
+                    {isActive ? (
+                      <span className="active-check-icon" title="Active">✓</span>
+                    ) : (
+                      <span className="switch-to-btn">Switch →</span>
+                    )}
+                  </div>
                 </div>
-                <span className="switcher-arrow">→</span>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
+        {/* Footer CTA */}
         <div className="switcher-footer">
           <button
             type="button"
-            className="add-new-shop-btn"
+            className="connect-new-shop-btn"
             onClick={onAddNewShop}
           >
-            ➕ Connect Another Shop
+            <span className="btn-plus-icon">➕</span>
+            <span className="btn-text">Connect Another Shop / Facebook Page</span>
           </button>
         </div>
       </div>

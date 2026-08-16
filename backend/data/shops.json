@@ -1,52 +1,9 @@
 {
   "shops": [
     {
-      "id": "shop_389542574764665",
-      "createdAt": "2026-08-16T05:16:29.977Z",
-      "updatedAt": "2026-08-16T05:20:47.740Z",
-      "shopName": "Frameography",
-      "ownerName": "Chandan Mallik",
-      "ownerEmail": "",
-      "ownerMetaUserId": "984330234649917",
-      "facebook": {
-        "pageId": "389542574764665",
-        "pageName": "Frameography",
-        "pageAccessToken": "EAAXPZCkmpe14BSG1sZCV8uIyXEhPWA6EeOQnhjPieOTdhz0olHGETprPyevKZBZAosja4hVZBQHfsZAPrN7AXZCaupZBnwBH0wB8WZBBd6HION5xwvYzJZB5ZBCI1KDijB9T0RA7UU4ZC3XN2Fdw1o2AbpDZBA6oW7vKPJ42Xks3DiBFMZCHjSJvU0u1FMOEY2hCxHIZC1VeaNoEZCkR",
-        "fanCount": 634,
-        "pictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t39.30808-1/326361290_1590372871429940_3433051600285838180_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=106&ccb=1-7&_nc_sid=f907e8&_nc_ohc=SIvsO3Tnu8gQ7kNvwHKk5RM&_nc_oc=Adqvklzl2Tspbz62iX1f8H6KmfDhefmC8Dx4BIXo_l1SHpjFUvdew_EwQ0aAS6ZEb6w&_nc_zt=24&_nc_ht=scontent.fdel31-1.fna&edm=AJdBtusEAAAA&_nc_gid=_8X1hvbd6limBdCtOGkxBw&_nc_tpa=Q5bMBQJNJOEwWFgx8RV5RZ3ieYkw1fxgkwchUNuCzSrqbbhGqu9kwj5rgQo22MkWXM75iALuaNo3V93oEA&oh=00_AQGv5MAvTkDWQjqRMXf3jTcG34spscfQuDGLBP1JvWjBow&oe=6A872540"
-      },
-      "instagram": {
-        "igUserId": "17841405518453760",
-        "username": "frameography_official",
-        "name": "Frameography | Wedding Photographer Lucknow",
-        "profilePictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t51.82787-15/588223552_18388691605183949_1069360937617450020_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=7d201b&_nc_ohc=ae2tU8GoaAkQ7kNvwHAY8Y9&_nc_oc=AdrdNl50znWfq7TRUUVF2vS-tLMZMdp1FUOqJqLbyHYE4obnzkinUpc09_iJlDgUGhM&_nc_zt=23&_nc_ht=scontent.fdel31-1.fna&edm=AL-3X8kEAAAA&_nc_gid=s9qUDHy-eB8koOy6N3tE0w&oh=00_AQHPPoX1XfC0HIg20bqfgecJ6l8TC5WAKGNUoaI9tKwUqQ&oe=6A871B0B",
-        "followersCount": 1018,
-        "mediaCount": 241
-      },
-      "status": "active"
-    },
-    {
-      "id": "shop_1146578318542257",
-      "createdAt": "2026-08-16T05:17:32.176Z",
-      "updatedAt": "2026-08-16T05:18:18.919Z",
-      "shopName": "Healthy Manushya",
-      "ownerName": "Chandan Mallik",
-      "ownerEmail": "",
-      "ownerMetaUserId": "984330234649917",
-      "facebook": {
-        "pageId": "1146578318542257",
-        "pageName": "Healthy Manushya",
-        "pageAccessToken": "EAAXPZCkmpe14BSL6YsFfLslNnnUSSAYs570ZCLxXZBy7Lb5zkCAjBfv8S5s59u2G8qcWj3MFLYt7Pi3HPqATZA4t7BHF165rjf1TxjGTqnuw649GIpStZBl6KKXCFWpCsjZCEC9xSXOZC0QE5SNIJxvMgUqkuidiQfy1McI3tk80C3dFPONsi6sVMoC1TueEZBdz8X9x",
-        "fanCount": 0,
-        "pictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t39.30808-1/733499692_122102275563368418_730264582336541047_n.jpg?stp=c152.152.410.410a_dst-jpg_s200x200_tt6&_nc_cat=101&ccb=1-7&_nc_sid=f907e8&_nc_ohc=4H522OMSqX4Q7kNvwHMC0sw&_nc_oc=AdoWntb5_EPbf_G8iHrfmTWHdcVd3r1fP_Az_-h6wxsgs6FUgI4PxzUmguIMSVMfTyY&_nc_zt=24&_nc_ht=scontent.fdel31-1.fna&edm=AJdBtusEAAAA&_nc_gid=7-ZNgLc_2kHHlqtPn2dpxw&_nc_tpa=Q5bMBQKUQ-6bBZiUQ4PgyiqWqUmTsMggethjrJHtZJWlJhC4ZWt1Nu4VgITfHtqmSg1zCeMne6x9pZB0Iw&oh=00_AQFhY6cFnvo0JMXA5ikOJqpSYKNT5Y7p2JexVw3xuxxS7Q&oe=6A87086D"
-      },
-      "instagram": null,
-      "status": "active"
-    },
-    {
       "id": "shop_102575931769350",
-      "createdAt": "2026-08-16T05:19:10.454Z",
-      "updatedAt": "2026-08-16T05:19:12.069Z",
+      "createdAt": "2026-08-16T06:37:20.486Z",
+      "updatedAt": "2026-08-16T06:38:31.070Z",
       "shopName": "Arun J Sharma",
       "ownerName": "Chandan Mallik",
       "ownerEmail": "",
@@ -54,42 +11,17 @@
       "facebook": {
         "pageId": "102575931769350",
         "pageName": "Arun J Sharma",
-        "pageAccessToken": "EAAXPZCkmpe14BSGYsp4lh5yWZBsxooCTbx8nukoX2hco6ZBSBGQCP8ZBe0mzDcb4HBdoC02MbXZC6uhHWH4F4Dj8ujXzxkHHQEaDiLTyUdErHsgbo8ik5Jriyq0VwDRsxOglKmxTKLdJEP7ZBw1MYM5eNV3fvhQRgXrRuvs0OJCWGn4bKC3OTm5vcdKf9R0MnVy1mJv4QZD",
+        "pageAccessToken": "EAAXPZCkmpe14BSLEJZBnaRtG02MpuwFsREtnZAv9rufy3YpduNeKroIyQ2awb0VJfzZAzpNFZCNZBsgKPjNRZA9kNaFm5JTqJSCm2SQ21DxodNxFXHCz6FReZAGRVNhhkqo2xX2eS7UgGaS6e3csCNH9ap3Q4BZAjZAF3mIfZBi88mPYXn61j2JUlhH7EiDeH0AC9ZAfZBfsZD",
         "fanCount": 3797,
-        "pictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t39.30808-1/662300281_1588133806647524_2474772548955042479_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=108&ccb=1-7&_nc_sid=f907e8&_nc_ohc=uvJuCgh-BZUQ7kNvwEbu5Xj&_nc_oc=Adq7RMwBaumVUjCNI0DeUWz7l6lVCOHuAGCeSkxPkbHkxSPyhReIxSF6U33zyKBGWmw&_nc_zt=24&_nc_ht=scontent.fdel31-1.fna&edm=AJdBtusEAAAA&_nc_gid=4cXn_Yq_DKbvMC2BJuhA4w&_nc_tpa=Q5bMBQL2USGmoTAqSg-FQR_bJusmyQ4Pho1HLoNvZOKm7vtn2ESrbJqT72AXF97VCKw6ebLaYndtybE6JQ&oh=00_AQEQTCYCMoZmG9agVZI6bERQbAavQVRSVlFoOeMyNNz32g&oe=6A87112D"
+        "pictureUrl": "https://scontent.fdel76-1.fna.fbcdn.net/v/t39.30808-1/662300281_1588133806647524_2474772548955042479_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=108&ccb=1-7&_nc_sid=f907e8&_nc_ohc=uvJuCgh-BZUQ7kNvwEqTZ3O&_nc_oc=AdpeJRvL1g8DjdhfMdEvsrc61E0pnL5H-hdmvoBv3eCUH-DZ-yGdXedCKHjI_MMdCi8&_nc_zt=24&_nc_ht=scontent.fdel76-1.fna&edm=AJdBtusEAAAA&_nc_gid=QTZELodBziHQe8BYKQMtZw&_nc_tpa=Q5bMBQJ2MbhZh-RK73D3C5X9AoQHymdKizTJc5QkBGSDoVKF_4HUimgO3YexUi9lp49u_Wy51yM9NIEhVA&oh=00_AQFvJ7dMsncjFzTEQ8drPWAQ8uC-naSTAEnTUczdiM7M7A&oe=6A87496D"
       },
       "instagram": {
         "igUserId": "17841447873515878",
         "username": "arun_j_sharma",
         "name": "Arun Sharma",
-        "profilePictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t51.82787-15/660065051_18086001473595784_5323363112444061946_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=7d201b&_nc_ohc=uiIVr0CLw10Q7kNvwFpimen&_nc_oc=Adrrwa0aVaNZcwXscUdwRl6GcdeZGSJ3cSC7vAcLOUNmlbiT1WQ9QCGlFiQIA8MBBJA&_nc_zt=23&_nc_ht=scontent.fdel31-1.fna&edm=AL-3X8kEAAAA&_nc_gid=wkQk5AbVJJgqM3BOIuaPlg&oh=00_AQFvIsFdRDtzAejGXIBSGPA3SiOkMnNaQSQUp7V1z5umhg&oe=6A87319B",
-        "followersCount": 198027,
+        "profilePictureUrl": "https://scontent.fdel76-1.fna.fbcdn.net/v/t51.82787-15/660065051_18086001473595784_5323363112444061946_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=7d201b&_nc_ohc=uiIVr0CLw10Q7kNvwHtL3Yb&_nc_oc=AdqcozK3svbeWZ6uF-EfZsVK_UAutgw2qSNTQIV2C0vBxGS274ZTZ0HIXKgMVlIhybc&_nc_zt=23&_nc_ht=scontent.fdel76-1.fna&edm=AL-3X8kEAAAA&_nc_gid=aMgPPGDOsjqLiPCbnlDShg&oh=00_AQHbKCTi3UwYxVNz0dQXDv1Mmg9sDqoQpQe4oqHtcM80aw&oe=6A87319B",
+        "followersCount": 198024,
         "mediaCount": 841
-      },
-      "status": "active"
-    },
-    {
-      "id": "shop_461194823752748",
-      "createdAt": "2026-08-16T05:21:44.237Z",
-      "updatedAt": "2026-08-16T05:23:07.077Z",
-      "shopName": "CKR Technologies",
-      "ownerName": "Chandan Mallik",
-      "ownerEmail": "",
-      "ownerMetaUserId": "984330234649917",
-      "facebook": {
-        "pageId": "461194823752748",
-        "pageName": "CKR Technologies",
-        "pageAccessToken": "EAAXPZCkmpe14BSJrNW8E9ZACW5LW3lWdB9qmmSZBQ9xKHObtNdbkagazNcVBcFk4wUpV634ZByBCI8FtlCY5NBVYGXwgnFoaqu7uoqR9wREPZC8vayAREKrEXD5RCtJn25HPjmGcWXp4ojBeG1QVthMVkYoraOlCkZCtNKPHKKBj7N20Tb4PQsgYfZAEdKD2uedOkLL",
-        "fanCount": 1096,
-        "pictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t39.30808-1/754143337_122169797786700192_6222183288504723018_n.jpg?stp=c274.0.790.791a_dst-jpg_s200x200_tt6&_nc_cat=110&ccb=1-7&_nc_sid=f907e8&_nc_ohc=bP0Ywp0ZtegQ7kNvwFJ_Rdg&_nc_oc=AdqsRSgmKqxYwXveOpV9sZ9torIYOVMHsv5tntLPDLbT1p0A43h7cJlo3WPxLrXVNkg&_nc_zt=24&_nc_ht=scontent.fdel31-1.fna&edm=AJdBtusEAAAA&_nc_gid=-BK3f8KwTltcF7PKkg4N5g&_nc_tpa=Q5bMBQICxkR2u_v7w1BTcDuj7JodwECUH7CkgIqBzHTB0JV9JbMOWcrxW0HzltwCvK67GlyrS8mvZJaMMg&oh=00_AQEJoD9eMQzmTDppZN3qs4F0rlYsrJslfmhRyi1E_HzNVQ&oe=6A86FFCD"
-      },
-      "instagram": {
-        "igUserId": "17841471645943814",
-        "username": "argosmob_tech",
-        "name": "ArgosMob Tech & AI Pvt LTD",
-        "profilePictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t51.2885-15/470737682_1260820858528041_7812594431915758742_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=7d201b&_nc_ohc=PAnzvwz9178Q7kNvwF8d2Wc&_nc_oc=AdrLpZaMYExFnvBgSNClMfBgNvkXuJ9LrdSz7AZ9PknlrC41C0Uh65Z9Bz5qsXPNcH8&_nc_zt=23&_nc_ht=scontent.fdel31-1.fna&edm=AL-3X8kEAAAA&oh=00_AQEJYZfReFMGb8I2kHMnwom9veEJoDvVCwuMJOo3C6JAPQ&oe=6A8703E7",
-        "followersCount": 476,
-        "mediaCount": 24
       },
       "status": "active"
     }
