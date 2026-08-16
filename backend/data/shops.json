@@ -1,34 +1,9 @@
 {
   "shops": [
     {
-      "id": "shop_102575931769350",
-      "createdAt": "2026-08-16T06:37:20.486Z",
-      "updatedAt": "2026-08-16T06:38:48.676Z",
-      "shopName": "Arun J Sharma",
-      "ownerName": "Chandan Mallik",
-      "ownerEmail": "",
-      "ownerMetaUserId": "984330234649917",
-      "facebook": {
-        "pageId": "102575931769350",
-        "pageName": "Arun J Sharma",
-        "pageAccessToken": "EAAXPZCkmpe14BSLEJZBnaRtG02MpuwFsREtnZAv9rufy3YpduNeKroIyQ2awb0VJfzZAzpNFZCNZBsgKPjNRZA9kNaFm5JTqJSCm2SQ21DxodNxFXHCz6FReZAGRVNhhkqo2xX2eS7UgGaS6e3csCNH9ap3Q4BZAjZAF3mIfZBi88mPYXn61j2JUlhH7EiDeH0AC9ZAfZBfsZD",
-        "fanCount": 3797,
-        "pictureUrl": "https://scontent.fdel76-1.fna.fbcdn.net/v/t39.30808-1/662300281_1588133806647524_2474772548955042479_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=108&ccb=1-7&_nc_sid=f907e8&_nc_ohc=uvJuCgh-BZUQ7kNvwEqTZ3O&_nc_oc=AdpeJRvL1g8DjdhfMdEvsrc61E0pnL5H-hdmvoBv3eCUH-DZ-yGdXedCKHjI_MMdCi8&_nc_zt=24&_nc_ht=scontent.fdel76-1.fna&edm=AJdBtusEAAAA&_nc_gid=GVoZm3ARn0okpTAxV4KEIw&_nc_tpa=Q5bMBQIFf-1yl7FlbxbuAJTG037NANnJ_1kUVLDVS1CXLVW7N4jSv95IQifm63hTz7MLX0OEXyiP26ppYg&oh=00_AQFiHvbBSZhNy-ETBN8Ei3Ic__HcpSSIgENigHSnqVTLmQ&oe=6A87496D"
-      },
-      "instagram": {
-        "igUserId": "17841447873515878",
-        "username": "arun_j_sharma",
-        "name": "Arun Sharma",
-        "profilePictureUrl": "https://scontent.fdel76-1.fna.fbcdn.net/v/t51.82787-15/660065051_18086001473595784_5323363112444061946_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=7d201b&_nc_ohc=uiIVr0CLw10Q7kNvwHtL3Yb&_nc_oc=AdqcozK3svbeWZ6uF-EfZsVK_UAutgw2qSNTQIV2C0vBxGS274ZTZ0HIXKgMVlIhybc&_nc_zt=23&_nc_ht=scontent.fdel76-1.fna&edm=AL-3X8kEAAAA&_nc_gid=pdPsXowqyMXoJ9uK1i1H3w&oh=00_AQFfmH5RIsUb5jSX8jcXuUHgOiPaE5lgvnOBs6zM-hh6Sw&oe=6A87319B",
-        "followersCount": 198024,
-        "mediaCount": 841
-      },
-      "status": "active"
-    },
-    {
       "id": "shop_461194823752748",
       "createdAt": "2026-08-16T06:40:08.482Z",
-      "updatedAt": "2026-08-16T06:46:50.477Z",
+      "updatedAt": "2026-08-16T08:22:37.023Z",
       "shopName": "CKR Technologies",
       "ownerName": "Chandan Mallik",
       "ownerEmail": "",
@@ -38,7 +13,7 @@
         "pageName": "CKR Technologies",
         "pageAccessToken": "EAAXPZCkmpe14BSAZA9O0XPeQTHskrDypeiI0ZAZBpFDvg7K0m6djfbOZCzE20sVkQfjRZAZCx47bEkqZC9B8szVvWca9GZB0ypZBmslbTucIaRYVNDFi7ZAtyRRLZBzbcgPUStPPgTmHlz3qw5ZBErwRwlahzu4aBZBdqnoJEepajTikg6DwAWasIq66IlmoI4H2LCpUVZAyLMj",
         "fanCount": 1096,
-        "pictureUrl": "https://scontent-del3-2.xx.fbcdn.net/v/t39.30808-1/754143337_122169797786700192_6222183288504723018_n.jpg?stp=c274.0.790.791a_dst-jpg_s200x200_tt6&_nc_cat=110&ccb=1-7&_nc_sid=f907e8&_nc_ohc=bP0Ywp0ZtegQ7kNvwHnC27-&_nc_oc=AdpZVrx0bJzFyn328eehfrnd5o6acfWiebb9LqzH8BC3BKF3DlmtLjX7NZGU6wI0PoE&_nc_zt=24&_nc_ht=scontent-del3-2.xx&edm=AJdBtusEAAAA&_nc_gid=CPQZT2smi2MVITidhkQx4w&_nc_tpa=Q5bMBQIFcTkQzx7IEmRVLJusfKDDuTJ5sags9M4UX7VgnspLoXDil2h7UtyFgSKbuZ2sFFxFd3JcOg915g&oh=00_AQH0q_4jdTlunDOnubPx_03Zh3Fc6d87UE3ic2kLE2tIUw&oe=6A87380D"
+        "pictureUrl": "https://scontent-del3-2.xx.fbcdn.net/v/t39.30808-1/754143337_122169797786700192_6222183288504723018_n.jpg?stp=c274.0.790.791a_dst-jpg_s200x200_tt6&_nc_cat=110&ccb=1-7&_nc_sid=f907e8&_nc_ohc=bP0Ywp0ZtegQ7kNvwHnC27-&_nc_oc=AdpZVrx0bJzFyn328eehfrnd5o6acfWiebb9LqzH8BC3BKF3DlmtLjX7NZGU6wI0PoE&_nc_zt=24&_nc_ht=scontent-del3-2.xx&edm=AJdBtusEAAAA&_nc_gid=Ai674fLFbb7S54wq9zjuWg&_nc_tpa=Q5bMBQJWeiJ7AoXCzU5k2fyqY4WHtW8JoxYSF4Aq9aWOqh8VSR6qZTq4LSYHz9XpYkkcHQEfGe4OIN9Tow&oh=00_AQFu1U-3Uk-WZGGkdqgKpGC0uPX2eARJeWGDP7Ts1ha81w&oe=6A87380D"
       },
       "instagram": {
         "igUserId": "17841471645943814",
@@ -46,7 +21,7 @@
         "name": "ArgosMob Tech & AI Pvt LTD",
         "profilePictureUrl": "https://scontent-del3-2.xx.fbcdn.net/v/t51.2885-15/470737682_1260820858528041_7812594431915758742_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=7d201b&_nc_ohc=PAnzvwz9178Q7kNvwE3DhKe&_nc_oc=Adp_Xt9j1aJ9xMBzCwWhmkbVKsW9bnpTvMMyF-NWevKSGj4Vj6I9KTd6ZAQ51C7wim4&_nc_zt=23&_nc_ht=scontent-del3-2.xx&edm=AL-3X8kEAAAA&oh=00_AQEmOHQYxDx8a-pPwhbIVLevKmQ4GnA9RrXwxLEqSJFMKw&oe=6A873C27",
         "followersCount": 476,
-        "mediaCount": 25
+        "mediaCount": 24
       },
       "status": "active"
     }

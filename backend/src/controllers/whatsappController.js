@@ -158,7 +158,7 @@ exports.generateBulkLinks = (req, res) => {
 exports.sendViaCloud = async (req, res) => {
   try {
     const shopId = getShopId(req);
-    const { templateId, customerId, extraVars = {}, shopName } = req.body;
+    const { templateId, customerId, extraVars = {}, shopName, metaTemplateName } = req.body;
 
     if (!shopId) return res.status(400).json({ success: false, error: 'Shop ID is required.', code: 'MISSING_SHOP_ID' });
     if (!templateId) return res.status(400).json({ success: false, error: 'Template ID is required.', code: 'MISSING_TEMPLATE' });
@@ -175,7 +175,26 @@ exports.sendViaCloud = async (req, res) => {
       ...extraVars,
     });
 
-    const result = await whatsappService.sendViaCloudAPI(customer.phone, renderedBody);
+    // Check if a specific Meta template is configured or fallback to template name
+    const templateConfig = metaTemplateName ? {
+      templateName: metaTemplateName,
+      languageCode: 'en_US',
+      parameters: [customer.name, shopName, extraVars.amount || extraVars.offerDetails || ''].filter(Boolean),
+    } : {
+      // Default to hello_world for testing if no approved custom template is specified
+      templateName: process.env.WHATSAPP_DEFAULT_TEMPLATE || 'hello_world',
+      languageCode: 'en_US',
+    };
+
+    let result;
+    try {
+      // First attempt: official Meta Template message (bypasses 24h restriction)
+      result = await whatsappService.sendViaCloudAPI(customer.phone, renderedBody, templateConfig);
+    } catch (templateErr) {
+      // Fallback attempt: freeform text
+      console.warn('[whatsappController:sendViaCloud] Template failed, attempting text fallback:', templateErr.message);
+      result = await whatsappService.sendViaCloudAPI(customer.phone, renderedBody, null);
+    }
 
     customerRepo.recordReminderSent(shopId, customerId);
     console.log(`[whatsapp:cloud] Message sent to "${customer.name}" (${customer.phone}) - shop ${shopId}`);

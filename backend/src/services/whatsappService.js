@@ -56,11 +56,9 @@ function buildWAMeLink(phone, messageBody) {
 }
 
 // ── Mode B: Meta WhatsApp Cloud API ──────────────────────────
-// Sends a FREE-FORM text message via the official WhatsApp Business Cloud API.
-// Requires WHATSAPP_PHONE_NUMBER_ID and WHATSAPP_ACCESS_TOKEN in .env
-// NOTE: Only works within 24h customer-initiated conversation window (session window).
-// For outbound cold notifications, Meta requires pre-approved Template Messages.
-async function sendViaCloudAPI(phone, messageBody) {
+// Sends an official WhatsApp Template Message (delivered cold 24/7 without customer messaging first)
+// or free-form text if templateName is not provided.
+async function sendViaCloudAPI(phone, messageBody, templateConfig = null) {
   const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
   const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
 
@@ -75,12 +73,38 @@ async function sendViaCloudAPI(phone, messageBody) {
 
   const url = `https://graph.facebook.com/v19.0/${phoneNumberId}/messages`;
 
-  const { data } = await axios.post(url, {
-    messaging_product: 'whatsapp',
-    to: normalizedPhone,
-    type: 'text',
-    text: { body: messageBody, preview_url: false },
-  }, {
+  let payload;
+
+  if (templateConfig && templateConfig.templateName) {
+    // Official Meta Approved Template payload (delivers 24/7 cold)
+    payload = {
+      messaging_product: 'whatsapp',
+      to: normalizedPhone,
+      type: 'template',
+      template: {
+        name: templateConfig.templateName,
+        language: { code: templateConfig.languageCode || 'en_US' },
+        ...(templateConfig.parameters && templateConfig.parameters.length > 0 ? {
+          components: [
+            {
+              type: 'body',
+              parameters: templateConfig.parameters.map(text => ({ type: 'text', text: String(text) })),
+            },
+          ],
+        } : {}),
+      },
+    };
+  } else {
+    // Freeform text message (for open 24h conversation windows or test sandbox)
+    payload = {
+      messaging_product: 'whatsapp',
+      to: normalizedPhone,
+      type: 'text',
+      text: { body: messageBody, preview_url: false },
+    };
+  }
+
+  const { data } = await axios.post(url, payload, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
