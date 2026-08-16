@@ -23,6 +23,18 @@
       "lastReminder": "2026-08-16T08:25:44.711Z",
       "createdAt": "2026-08-16T07:10:20.401Z",
       "updatedAt": "2026-08-16T08:25:44.711Z"
+    },
+    {
+      "id": "cust_63da267d15b440b8",
+      "shopId": "shop_461194823752748",
+      "name": "Chandan personal",
+      "phone": "8860573804",
+      "balanceDue": 0,
+      "notes": "",
+      "tags": [],
+      "lastReminder": "2026-08-16T08:27:47.802Z",
+      "createdAt": "2026-08-16T08:27:28.598Z",
+      "updatedAt": "2026-08-16T08:27:47.802Z"
     }
   ]
 }

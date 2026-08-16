@@ -14,11 +14,56 @@ function getAllTemplates() {
   }
 }
 
+function saveTemplates(templates) {
+  fs.writeFileSync(TEMPLATES_PATH, JSON.stringify(templates, null, 2), 'utf8');
+}
+
 function getTemplate(templateId) {
   const templates = getAllTemplates();
   const tpl = templates.find(t => t.id === templateId);
   if (!tpl) throw new Error(`Template "${templateId}" not found.`);
   return tpl;
+}
+
+// ── Create a new custom template ──────────────────────────────
+function createTemplate({ name, category, description, body, icon = '📝' }) {
+  if (!name || !name.trim()) throw new Error('Template name is required.');
+  if (!body || !body.trim()) throw new Error('Template message body is required.');
+
+  const templates = getAllTemplates();
+
+  // Extract variables inside {{variableName}}
+  const matches = body.match(/\{\{([a-zA-Z0-9_]+)\}\}/g) || [];
+  const variables = Array.from(new Set(matches.map(m => m.replace(/[\{\}]/g, ''))));
+
+  const id = `custom_${Date.now()}_${name.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 15)}`;
+  const displayName = `${icon} ${name.trim()}`;
+
+  const newTemplate = {
+    id,
+    name: displayName,
+    category: category || 'general',
+    description: description || 'Custom template created by user',
+    variables,
+    body: body.trim(),
+    isCustom: true,
+    createdAt: new Date().toISOString(),
+  };
+
+  templates.push(newTemplate);
+  saveTemplates(templates);
+  return newTemplate;
+}
+
+// ── Delete a custom template ──────────────────────────────────
+function deleteTemplate(templateId) {
+  const templates = getAllTemplates();
+  const idx = templates.findIndex(t => t.id === templateId);
+  if (idx === -1) throw new Error(`Template "${templateId}" not found.`);
+
+  const [removed] = templates.splice(idx, 1);
+  saveTemplates(templates);
+  return removed;
 }
 
 // ── Template Rendering ────────────────────────────────────────
@@ -135,6 +180,8 @@ function generateBulkWALinks(customers, template, extraVars = {}) {
 module.exports = {
   getAllTemplates,
   getTemplate,
+  createTemplate,
+  deleteTemplate,
   renderTemplate,
   buildWAMeLink,
   sendViaCloudAPI,

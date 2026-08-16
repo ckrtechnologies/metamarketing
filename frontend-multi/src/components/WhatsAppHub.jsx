@@ -1,12 +1,25 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
-  getTemplates, getCustomers, addCustomer,
+  getTemplates, createTemplate, deleteTemplate,
+  getCustomers, addCustomer,
   updateCustomer, deleteCustomer, generateWALink,
   generateBulkLinks, sendViaCloud,
 } from '../api/whatsapp';
 import './WhatsAppHub.css';
 
 const DELIVERY_MODE_KEY = 'wa_delivery_mode';
+
+const EMOJI_OPTIONS = ['📢', '💳', '🎉', '📦', '⏰', '🎁', '🛍️', '💰', '🔔', '🪔', '🚀', '⭐'];
+
+const COMMON_TAGS = [
+  { tag: '{{customerName}}', label: 'Customer Name' },
+  { tag: '{{shopName}}', label: 'Shop Name' },
+  { tag: '{{amount}}', label: '₹ Amount' },
+  { tag: '{{dueDate}}', label: 'Due Date' },
+  { tag: '{{offerDetails}}', label: 'Offer Details' },
+  { tag: '{{validTill}}', label: 'Valid Till' },
+  { tag: '{{discountPercent}}', label: 'Discount %' },
+];
 
 export default function WhatsAppHub({ shop }) {
   const shopId = shop?.id || shop?.shopId;
@@ -20,12 +33,23 @@ export default function WhatsAppHub({ shop }) {
   const [extraVars, setExtraVars] = useState({});
   const [deliveryMode, setDeliveryMode] = useState(() => localStorage.getItem(DELIVERY_MODE_KEY) || 'wame');
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState({ customers: true, sending: false });
+  const [loading, setLoading] = useState({ customers: true, sending: false, creatingTpl: false });
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [newCustomer, setNewCustomer] = useState({ name: '', phone: '', balanceDue: '', notes: '' });
+
+  // Template creation modal state
+  const [showCreateTplModal, setShowCreateTplModal] = useState(false);
+  const [newTpl, setNewTpl] = useState({
+    name: '',
+    category: 'promotion',
+    description: '',
+    body: '',
+    icon: '📢',
+  });
+  const bodyTextareaRef = useRef(null);
 
   // ── Load Data ─────────────────────────────────────────────────
   const loadCustomers = useCallback(() => {
@@ -125,6 +149,74 @@ export default function WhatsAppHub({ shop }) {
       setCustomers(prev => prev.filter(c => c.id !== customer.id));
       setSelectedCustomerIds(prev => { const n = new Set(prev); n.delete(customer.id); return n; });
       showSuccess(`${customer.name} removed from ledger.`);
+    } catch (err) {
+      setError(err.response?.data?.error || err.message);
+    }
+  }
+
+  // ── Template Tag Quick Insert ─────────────────────────────────
+  function handleInsertTag(tag) {
+    const textarea = bodyTextareaRef.current;
+    if (!textarea) {
+      setNewTpl(prev => ({ ...prev, body: prev.body + tag }));
+      return;
+    }
+    const start = textarea.selectionStart || 0;
+    const end = textarea.selectionEnd || 0;
+    const text = newTpl.body;
+    const before = text.substring(0, start);
+    const after = text.substring(end, text.length);
+    const nextBody = before + tag + after;
+
+    setNewTpl(prev => ({ ...prev, body: nextBody }));
+
+    // Set cursor position after the inserted tag
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + tag.length, start + tag.length);
+    }, 0);
+  }
+
+  // ── Create Template ───────────────────────────────────────────
+  async function handleCreateTemplate(e) {
+    e.preventDefault();
+    if (!newTpl.name.trim()) return alert('Please enter a template name.');
+    if (!newTpl.body.trim()) return alert('Please write a message body.');
+
+    setLoading(l => ({ ...l, creatingTpl: true }));
+    setError(null);
+    try {
+      const created = await createTemplate({
+        name: newTpl.name.trim(),
+        category: newTpl.category,
+        description: newTpl.description.trim() || `Custom ${newTpl.category} template`,
+        body: newTpl.body.trim(),
+        icon: newTpl.icon,
+      });
+
+      setTemplates(prev => [...prev, created]);
+      setSelectedTemplate(created);
+      setShowCreateTplModal(false);
+      setNewTpl({ name: '', category: 'promotion', description: '', body: '', icon: '📢' });
+      showSuccess(`✅ Template "${created.name}" created!`);
+    } catch (err) {
+      setError(err.response?.data?.error || err.message);
+    } finally {
+      setLoading(l => ({ ...l, creatingTpl: false }));
+    }
+  }
+
+  // ── Delete Template ───────────────────────────────────────────
+  async function handleDeleteTemplate(tpl, e) {
+    e.stopPropagation();
+    if (!window.confirm(`Delete template "${tpl.name}"?`)) return;
+    try {
+      await deleteTemplate(tpl.id);
+      setTemplates(prev => prev.filter(t => t.id !== tpl.id));
+      if (selectedTemplate?.id === tpl.id) {
+        setSelectedTemplate(templates[0] || null);
+      }
+      showSuccess(`Template deleted.`);
     } catch (err) {
       setError(err.response?.data?.error || err.message);
     }
@@ -469,19 +561,40 @@ export default function WhatsAppHub({ shop }) {
 
           {/* Template Picker */}
           <div className="wa-templates-section">
-            <div className="wa-section-label">SELECT TEMPLATE</div>
+            <div className="wa-templates-header">
+              <div className="wa-section-label">SELECT TEMPLATE</div>
+              <button
+                type="button"
+                className="wa-create-tpl-btn"
+                onClick={() => setShowCreateTplModal(true)}
+              >
+                ➕ Create Template
+              </button>
+            </div>
+
             <div className="wa-templates-grid">
               {templates.map(tpl => (
-                <button
+                <div
                   key={tpl.id}
-                  type="button"
                   className={`wa-template-card ${selectedTemplate?.id === tpl.id ? 'wa-template-card--selected' : ''}`}
                   onClick={() => setSelectedTemplate(tpl)}
                 >
-                  <span className="wa-template-icon">{tpl.name.split(' ')[0]}</span>
+                  <div className="wa-template-card-top">
+                    <span className="wa-template-icon">{tpl.name.split(' ')[0]}</span>
+                    {tpl.isCustom && (
+                      <button
+                        type="button"
+                        className="wa-tpl-delete-btn"
+                        onClick={(e) => handleDeleteTemplate(tpl, e)}
+                        title="Delete custom template"
+                      >
+                        🗑️
+                      </button>
+                    )}
+                  </div>
                   <span className="wa-template-name">{tpl.name.slice(tpl.name.indexOf(' ') + 1)}</span>
                   <span className="wa-template-desc">{tpl.description}</span>
-                </button>
+                </div>
               ))}
             </div>
           </div>
@@ -543,6 +656,159 @@ export default function WhatsAppHub({ shop }) {
           </div>
         </div>
       </div>
+
+      {/* ── CREATE TEMPLATE MODAL ─────────────────────────────── */}
+      {showCreateTplModal && (
+        <div className="wa-modal-overlay" onClick={() => setShowCreateTplModal(false)}>
+          <div className="wa-modal" onClick={e => e.stopPropagation()}>
+            <div className="wa-modal-header">
+              <div className="wa-modal-title-box">
+                <span className="wa-modal-icon">✨</span>
+                <h3>Create New WhatsApp Template</h3>
+              </div>
+              <button
+                type="button"
+                className="wa-modal-close-btn"
+                onClick={() => setShowCreateTplModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateTemplate} className="wa-modal-form">
+              <div className="wa-modal-row">
+                <div className="wa-modal-field">
+                  <label className="wa-var-label">Icon / Emoji</label>
+                  <div className="wa-emoji-picker">
+                    {EMOJI_OPTIONS.map(emoji => (
+                      <button
+                        key={emoji}
+                        type="button"
+                        className={`wa-emoji-btn ${newTpl.icon === emoji ? 'wa-emoji-btn--selected' : ''}`}
+                        onClick={() => setNewTpl(p => ({ ...p, icon: emoji }))}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="wa-modal-field">
+                  <label className="wa-var-label">Category</label>
+                  <select
+                    className="wa-form-input"
+                    value={newTpl.category}
+                    onChange={e => setNewTpl(p => ({ ...p, category: e.target.value }))}
+                  >
+                    <option value="payment">💳 Payment</option>
+                    <option value="promotion">🎉 Promotion / Offer</option>
+                    <option value="order">📦 Order Update</option>
+                    <option value="festival">🪔 Festival</option>
+                    <option value="reminder">⏰ Reminder</option>
+                    <option value="general">📢 General Announcement</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="wa-modal-field">
+                <label className="wa-var-label">Template Name *</label>
+                <input
+                  type="text"
+                  className="wa-form-input"
+                  placeholder="e.g. Weekend Flash Sale or 50% Off On Kurti"
+                  value={newTpl.name}
+                  onChange={e => setNewTpl(p => ({ ...p, name: e.target.value }))}
+                  required
+                />
+              </div>
+
+              <div className="wa-modal-field">
+                <label className="wa-var-label">Description (optional)</label>
+                <input
+                  type="text"
+                  className="wa-form-input"
+                  placeholder="Short note about when to use this template"
+                  value={newTpl.description}
+                  onChange={e => setNewTpl(p => ({ ...p, description: e.target.value }))}
+                />
+              </div>
+
+              <div className="wa-modal-field">
+                <div className="wa-field-header-row">
+                  <label className="wa-var-label">Message Body *</label>
+                  <span className="wa-tag-hint">Click a tag below to insert it at your cursor:</span>
+                </div>
+
+                {/* Quick Variable Insertion Pills */}
+                <div className="wa-tags-bar">
+                  {COMMON_TAGS.map(({ tag, label }) => (
+                    <button
+                      key={tag}
+                      type="button"
+                      className="wa-tag-pill"
+                      onClick={() => handleInsertTag(tag)}
+                      title={`Insert ${tag}`}
+                    >
+                      + {label} <span className="wa-tag-code">{tag}</span>
+                    </button>
+                  ))}
+                </div>
+
+                <textarea
+                  ref={bodyTextareaRef}
+                  className="wa-form-textarea"
+                  rows={6}
+                  placeholder={`Hello {{customerName}}! 👋\n\nWe have a special announcement from {{shopName}}...\n\nThank you! 🙏`}
+                  value={newTpl.body}
+                  onChange={e => setNewTpl(p => ({ ...p, body: e.target.value }))}
+                  required
+                />
+              </div>
+
+              {/* Live Preview Inside Modal */}
+              {newTpl.body.trim() && (
+                <div className="wa-modal-preview">
+                  <label className="wa-var-label">Live Message Preview</label>
+                  <div className="wa-preview-bubble">
+                    <div className="wa-preview-header">
+                      <span className="wa-preview-from">{shopName}</span>
+                      <span className="wa-preview-time">Now</span>
+                    </div>
+                    <pre className="wa-preview-body">
+                      {newTpl.body
+                        .replace(/\{\{customerName\}\}/g, 'Rahul Gupta')
+                        .replace(/\{\{shopName\}\}/g, shopName)
+                        .replace(/\{\{amount\}\}/g, '1,500')
+                        .replace(/\{\{dueDate\}\}/g, '25-Aug-2026')
+                        .replace(/\{\{offerDetails\}\}/g, 'Flat 20% OFF on all items')
+                        .replace(/\{\{validTill\}\}/g, 'Sunday')
+                        .replace(/\{\{discountPercent\}\}/g, '20')}
+                    </pre>
+                  </div>
+                </div>
+              )}
+
+              <div className="wa-modal-actions">
+                <button
+                  type="submit"
+                  className="wa-cta-btn wa-cta-btn--bulk"
+                  disabled={loading.creatingTpl}
+                >
+                  {loading.creatingTpl ? 'Saving…' : '💾 Save Template'}
+                </button>
+                <button
+                  type="button"
+                  className="wa-form-cancel-btn"
+                  onClick={() => setShowCreateTplModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

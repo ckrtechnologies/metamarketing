@@ -26,6 +26,34 @@ exports.getTemplates = (req, res) => {
   }
 };
 
+// ── POST /api/v2/whatsapp/templates ───────────────────────────
+exports.createTemplate = (req, res) => {
+  try {
+    const { name, category, description, body, icon } = req.body;
+    if (!name || !name.trim()) return res.status(400).json({ success: false, error: 'Template name is required.' });
+    if (!body || !body.trim()) return res.status(400).json({ success: false, error: 'Template message body is required.' });
+
+    const newTemplate = whatsappService.createTemplate({ name, category, description, body, icon });
+    res.status(201).json({ success: true, data: newTemplate, message: `Template "${newTemplate.name}" created.` });
+  } catch (err) {
+    const f = formatError(err);
+    res.status(500).json({ success: false, error: f.message, code: f.code });
+  }
+};
+
+// ── DELETE /api/v2/whatsapp/templates/:id ─────────────────────
+exports.deleteTemplate = (req, res) => {
+  try {
+    const { id } = req.params;
+    const removed = whatsappService.deleteTemplate(id);
+    res.json({ success: true, message: `Template "${removed.name}" deleted.`, data: removed });
+  } catch (err) {
+    const f = formatError(err);
+    const status = f.message.includes('not found') ? 404 : 500;
+    res.status(status).json({ success: false, error: f.message, code: f.code });
+  }
+};
+
 // ── GET /api/v2/whatsapp/customers ────────────────────────────
 exports.getCustomers = (req, res) => {
   try {

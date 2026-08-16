@@ -5,6 +5,8 @@ const router = express.Router();
 
 // ── Template Catalogue ────────────────────────────────────────
 router.get('/templates', whatsappController.getTemplates);
+router.post('/templates', whatsappController.createTemplate);
+router.delete('/templates/:id', whatsappController.deleteTemplate);
 
 // ── Customer Ledger CRUD ──────────────────────────────────────
 router.get('/customers', whatsappController.getCustomers);

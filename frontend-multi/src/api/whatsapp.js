@@ -4,6 +4,12 @@ import api from './client';
 export const getTemplates = () =>
   api.get('/v2/whatsapp/templates').then(r => r.data.data);
 
+export const createTemplate = (data) =>
+  api.post('/v2/whatsapp/templates', data).then(r => r.data.data);
+
+export const deleteTemplate = (templateId) =>
+  api.delete(`/v2/whatsapp/templates/${templateId}`).then(r => r.data);
+
 // ── Customer Ledger CRUD ──────────────────────────────────────
 export const getCustomers = (shopId) =>
   api.get('/v2/whatsapp/customers', {
