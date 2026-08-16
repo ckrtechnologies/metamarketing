@@ -70,8 +70,20 @@ async function getLiveShopProfile(shopId) {
     shopId: shop.id,
     shopName: shop.shopName,
     ownerName: shop.ownerName,
-    facebook: pageRes.data,
-    instagram: igData || shop.instagram,
+    facebook: {
+      pageId: shop.facebook.pageId,
+      pageName: pageRes.data.name || shop.facebook.pageName,
+      fanCount: pageRes.data.fan_count ?? shop.facebook.fanCount ?? 0,
+      pictureUrl: pageRes.data.picture?.data?.url || shop.facebook.pictureUrl,
+    },
+    instagram: igData ? {
+      igUserId: igData.id,
+      username: igData.username,
+      name: igData.name,
+      profilePictureUrl: igData.profile_picture_url || shop.instagram?.profilePictureUrl,
+      followersCount: igData.followers_count ?? shop.instagram?.followersCount ?? 0,
+      mediaCount: igData.media_count ?? shop.instagram?.mediaCount ?? 0,
+    } : shop.instagram,
   };
 }
 
