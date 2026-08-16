@@ -149,7 +149,7 @@ export default function WhatsAppHub({ shop }) {
     const phoneToConnect = selectedNum?.displayPhoneNumber || selectedNum?.phoneNumberId || phoneInput.trim();
     if (!phoneToConnect) return alert('Please enter or select a phone number.');
 
-    setLoading(l => ({ ...l, oauth: true }));
+    setLoading(l => ({ ...l, oauth: true, templates: true }));
     setError(null);
     try {
       await connectWhatsAppOAuth(shopId, {
@@ -157,15 +157,26 @@ export default function WhatsAppHub({ shop }) {
         phoneNumberId: selectedNum?.phoneNumberId,
         wabaId: selectedNum?.wabaId,
       });
-      showSuccess(`🎉 WhatsApp Number ${selectedNum?.displayPhoneNumber || phoneToConnect} connected for ${shopName}!`);
       setShowConnectModal(false);
       setPhoneInput('');
-      loadStatus();
-      loadTemplates();
+
+      // Reload status & sync templates concurrently for switched number
+      const [statusData, tpls] = await Promise.all([
+        getWhatsAppStatus(shopId).catch(() => ({ connected: false })),
+        getTemplates(shopId).catch(() => []),
+      ]);
+
+      setWaStatus({ ...statusData, loading: false });
+      const safeTpls = Array.isArray(tpls) ? tpls : (tpls?.data || []);
+      setTemplates(safeTpls);
+      if (safeTpls.length > 0) {
+        setSelectedTemplate(safeTpls[0]);
+      }
+      showSuccess(`🎉 Connected to ${selectedNum?.displayPhoneNumber || phoneToConnect} — ${safeTpls.length} templates synced!`);
     } catch (err) {
       setError(err.response?.data?.error || err.message);
     } finally {
-      setLoading(l => ({ ...l, oauth: false }));
+      setLoading(l => ({ ...l, oauth: false, templates: false }));
     }
   }
 

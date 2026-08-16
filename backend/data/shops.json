@@ -3,7 +3,7 @@
     {
       "id": "shop_461194823752748",
       "createdAt": "2026-08-16T11:11:19.378Z",
-      "updatedAt": "2026-08-16T11:12:26.689Z",
+      "updatedAt": "2026-08-16T11:12:38.113Z",
       "shopName": "CKR Technologies",
       "ownerName": "Chandan Mallik",
       "ownerEmail": "",
@@ -26,13 +26,13 @@
       "status": "active",
       "whatsapp": {
         "connected": true,
-        "wabaId": "1844231982837700",
-        "phoneNumberId": "1076671092207220",
-        "displayPhoneNumber": "+91 89209 32354",
-        "verifiedName": "Stenna",
+        "wabaId": "469743566216329",
+        "phoneNumberId": "443930708804530",
+        "displayPhoneNumber": "+91 78140 51127",
+        "verifiedName": "Dr Vineet Chadha",
         "qualityRating": "GREEN",
         "accessToken": "EAANZBQCrNrfsBSEZBZC945SLeW6Y1XN5JTkis1zgCpmFO85wUQEx2p4NZCBNnmUISsRfHWeaZAWocZCnLioENNJNLzGiowhu7og7DiUAxzcZBKzyNxLTqvfEzb897YEbzZCXTo2xvRuNgHMuFZB6TF3UZBCgL0VdMwc4ZClgE5FjlAIroxxEw2P0LlsZBxjiZCq7xHgZDZD",
-        "connectedAt": "2026-08-16T11:12:26.689Z"
+        "connectedAt": "2026-08-16T11:12:38.112Z"
       }
     }
   ]
