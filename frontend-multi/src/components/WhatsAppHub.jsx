@@ -325,12 +325,12 @@ export default function WhatsAppHub({ shop }) {
     setError(null);
     try {
       const res = await getTemplates(shopId);
-      const list = res.data || [];
-      setTemplates(list);
-      if (!selectedTemplate && list.length > 0) {
-        setSelectedTemplate(list[0]);
+      const safeList = Array.isArray(res) ? res : (res?.data || []);
+      setTemplates(safeList);
+      if (safeList.length > 0) {
+        setSelectedTemplate(safeList[0]);
       }
-      showSuccess(`🎉 Synced ${list.length} template${list.length === 1 ? '' : 's'} live with Meta WhatsApp Cloud!`);
+      showSuccess(`🎉 Synced ${safeList.length} template${safeList.length === 1 ? '' : 's'} live with Meta WhatsApp Cloud!`);
     } catch (err) {
       setError(err.response?.data?.error || err.message);
     } finally {
