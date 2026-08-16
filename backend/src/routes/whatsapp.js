@@ -28,4 +28,12 @@ router.post('/bulk-links', whatsappController.generateBulkLinks);
 // Mode B: Meta WhatsApp Cloud API (Multi-tenant or .env fallback)
 router.post('/send-cloud', whatsappController.sendViaCloud);
 
+// ── Message History & Live Delivery Status ────────────────────
+router.get('/history', whatsappController.getMessageHistory);
+router.get('/history/stats', whatsappController.getHistoryStats);
+
+// ── Webhook: Meta Live Status Callbacks (delivered / read) ─────
+router.get('/webhook', whatsappController.verifyWebhook);
+router.post('/webhook', whatsappController.handleWebhook);
+
 module.exports = router;

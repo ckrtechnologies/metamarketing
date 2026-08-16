@@ -1,6 +1,7 @@
 const whatsappService = require('../services/whatsappService');
 const customerRepo = require('../repositories/customerRepository');
 const shopRepo = require('../repositories/shopRepository');
+const historyRepo = require('../repositories/historyRepository');
 
 // ── Extract shopId from header ─────────────────────────────────
 function getShopId(req) {
@@ -296,6 +297,17 @@ exports.generateWALink = async (req, res) => {
     // Record that reminder was sent
     customerRepo.recordReminderSent(shopId, customerId);
 
+    // Record in Message History
+    historyRepo.recordMessage(shopId, {
+      recipientName: customer.name,
+      recipientPhone: customer.phone,
+      templateId: template.id,
+      templateName: template.name,
+      renderedBody: result.renderedBody,
+      deliveryMode: 'wame',
+      status: 'sent',
+    });
+
     console.log(`[whatsapp] wa.me link generated for customer "${customer.name}" (${customer.phone}) - shop ${shopId} - template ${templateId}`);
     res.json({ success: true, data: result });
   } catch (err) {
@@ -327,8 +339,19 @@ exports.generateBulkLinks = async (req, res) => {
     const template = await whatsappService.getTemplate(templateId, shopId);
     const results = whatsappService.generateBulkWALinks(selected, template, { shopName, ...extraVars });
 
-    // Record reminder sent for all
-    selected.forEach(c => customerRepo.recordReminderSent(shopId, c.id));
+    // Record reminder sent and history for all
+    selected.forEach((c, idx) => {
+      customerRepo.recordReminderSent(shopId, c.id);
+      historyRepo.recordMessage(shopId, {
+        recipientName: c.name,
+        recipientPhone: c.phone,
+        templateId: template.id,
+        templateName: template.name,
+        renderedBody: results[idx]?.renderedBody || '',
+        deliveryMode: 'wame',
+        status: 'sent',
+      });
+    });
 
     console.log(`[whatsapp] Bulk wa.me links generated: ${results.length} customers - shop ${shopId} - template ${templateId}`);
     res.json({ success: true, data: results, total: results.length });
@@ -341,8 +364,12 @@ exports.generateBulkLinks = async (req, res) => {
 // ── POST /api/v2/whatsapp/send-cloud ─────────────────────────
 // Mode B: Sends via Meta WhatsApp Cloud API (requires .env config)
 exports.sendViaCloud = async (req, res) => {
+  let customer = null;
+  let template = null;
+  let renderedBody = '';
+  const shopId = getShopId(req);
+
   try {
-    const shopId = getShopId(req);
     const { templateId, customerId, extraVars = {}, shopName } = req.body;
 
     if (!shopId) return res.status(400).json({ success: false, error: 'Shop ID is required.', code: 'MISSING_SHOP_ID' });
@@ -350,11 +377,11 @@ exports.sendViaCloud = async (req, res) => {
     if (!customerId) return res.status(400).json({ success: false, error: 'Customer ID is required.', code: 'MISSING_CUSTOMER' });
 
     const customers = customerRepo.getCustomersForShop(shopId);
-    const customer = customers.find(c => c.id === customerId);
+    customer = customers.find(c => c.id === customerId);
     if (!customer) return res.status(404).json({ success: false, error: 'Customer not found.', code: 'CUSTOMER_NOT_FOUND' });
 
-    const template = await whatsappService.getTemplate(templateId, shopId);
-    const renderedBody = whatsappService.renderTemplate(template, {
+    template = await whatsappService.getTemplate(templateId, shopId);
+    renderedBody = whatsappService.renderTemplate(template, {
       customerName: customer.name,
       shopName,
       ...extraVars,
@@ -388,12 +415,122 @@ exports.sendViaCloud = async (req, res) => {
       result = await whatsappService.sendViaCloudAPI(customer.phone, renderedBody, null, shopId);
     }
 
+    const wamid = result?.messages?.[0]?.id || null;
     customerRepo.recordReminderSent(shopId, customerId);
-    console.log(`[whatsapp:cloud] Message sent to "${customer.name}" (${customer.phone}) - shop ${shopId}`);
-    res.json({ success: true, message: `WhatsApp message sent to ${customer.name} via Cloud API.`, data: result });
+
+    // Save successful message record to history
+    const historyRecord = historyRepo.recordMessage(shopId, {
+      wamid,
+      recipientName: customer.name,
+      recipientPhone: customer.phone,
+      templateId: template?.id,
+      templateName: template?.name,
+      renderedBody,
+      deliveryMode: 'cloud',
+      status: 'sent',
+    });
+
+    console.log(`[whatsapp:cloud] Message sent to "${customer.name}" (${customer.phone}) - shop ${shopId} - WAMID: ${wamid}`);
+    res.json({
+      success: true,
+      message: `WhatsApp message sent to ${customer.name} via Cloud API.`,
+      data: result,
+      historyRecord,
+    });
   } catch (err) {
     const f = formatError(err);
     console.error(`[whatsappController:sendViaCloud] ${f.code}:`, f.raw);
+
+    // Save failed message record to history
+    if (shopId && customer) {
+      historyRepo.recordMessage(shopId, {
+        recipientName: customer.name,
+        recipientPhone: customer.phone,
+        templateId: template?.id,
+        templateName: template?.name || 'Direct Message',
+        renderedBody,
+        deliveryMode: 'cloud',
+        status: 'failed',
+        errorMessage: f.message,
+      });
+    }
+
     res.status(500).json({ success: false, error: f.message, code: f.code });
+  }
+};
+
+// ── GET /api/v2/whatsapp/history ─────────────────────────────
+exports.getMessageHistory = async (req, res) => {
+  try {
+    const shopId = getShopId(req);
+    if (!shopId) return res.status(400).json({ success: false, error: 'Shop ID is required.', code: 'MISSING_SHOP_ID' });
+
+    const { status, search, limit, offset } = req.query;
+    const history = historyRepo.getHistoryForShop(shopId, {
+      status,
+      search,
+      limit: limit ? parseInt(limit, 10) : 100,
+      offset: offset ? parseInt(offset, 10) : 0,
+    });
+
+    res.json({ success: true, data: history });
+  } catch (err) {
+    const f = formatError(err);
+    res.status(500).json({ success: false, error: f.message, code: f.code });
+  }
+};
+
+// ── GET /api/v2/whatsapp/history/stats ───────────────────────
+exports.getHistoryStats = async (req, res) => {
+  try {
+    const shopId = getShopId(req);
+    if (!shopId) return res.status(400).json({ success: false, error: 'Shop ID is required.', code: 'MISSING_SHOP_ID' });
+
+    const stats = historyRepo.getStatsForShop(shopId);
+    res.json({ success: true, data: stats });
+  } catch (err) {
+    const f = formatError(err);
+    res.status(500).json({ success: false, error: f.message, code: f.code });
+  }
+};
+
+// ── GET /api/v2/whatsapp/webhook (Meta Webhook Verification) ──
+exports.verifyWebhook = (req, res) => {
+  const mode = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+
+  const expectedToken = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN || 'metamarketing_verify_token';
+  if (mode === 'subscribe' && token === expectedToken) {
+    console.log('[whatsapp:webhook] Verified successfully!');
+    return res.status(200).send(challenge);
+  }
+  return res.sendStatus(403);
+};
+
+// ── POST /api/v2/whatsapp/webhook (Meta Status Callbacks) ────
+exports.handleWebhook = (req, res) => {
+  try {
+    const body = req.body;
+    if (body.object === 'whatsapp_business_account') {
+      (body.entry || []).forEach(entry => {
+        (entry.changes || []).forEach(change => {
+          const value = change.value;
+          if (value?.statuses) {
+            value.statuses.forEach(st => {
+              const wamid = st.id;
+              const status = st.status; // 'sent' | 'delivered' | 'read' | 'failed'
+              const timestamp = st.timestamp ? new Date(parseInt(st.timestamp, 10) * 1000).toISOString() : null;
+              console.log(`[whatsapp:webhook] Status update: ${wamid} -> ${status}`);
+              historyRepo.updateMessageStatus(wamid, status, timestamp);
+            });
+          }
+        });
+      });
+    }
+    res.sendStatus(200);
+  } catch (err) {
+    console.error('[whatsapp:webhook] Error processing webhook:', err.message);
+    res.sendStatus(200); // Always 200 OK for Meta
   }
 };

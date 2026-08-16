@@ -1,0 +1,524 @@
+/* ── WhatsApp History & Live Delivery Status Module ─────────── */
+
+.wa-history-module {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  padding: 10px 0;
+  animation: fadeIn 0.25s ease-out;
+}
+
+/* ── KPI Metric Cards ────────────────────────────────────────── */
+.wa-hist-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.wa-hist-metric-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 16px 18px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  transition: transform 0.18s ease, border-color 0.18s ease;
+}
+
+.wa-hist-metric-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.wa-hist-metric-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  background: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.wa-hist-metric-icon--green {
+  background: rgba(37, 211, 102, 0.12);
+  color: #25D366;
+}
+
+.wa-hist-metric-icon--blue {
+  background: rgba(59, 130, 246, 0.12);
+  color: #60a5fa;
+}
+
+.wa-hist-metric-icon--red {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+}
+
+.wa-hist-metric-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wa-hist-metric-val {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+
+.wa-hist-metric-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+/* ── Toolbar: Filter Tabs & Search ───────────────────────────── */
+.wa-hist-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.wa-hist-filter-tabs {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.wa-hist-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wa-hist-tab-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.wa-hist-tab-btn--active {
+  background: #25D366 !important;
+  color: #06110b !important;
+  font-weight: 700;
+}
+
+.wa-hist-tab-count {
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.wa-hist-tab-btn--active .wa-hist-tab-count {
+  background: rgba(0, 0, 0, 0.2);
+  color: #06110b;
+}
+
+.wa-hist-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 4px 10px;
+  flex: 1;
+  max-width: 380px;
+}
+
+.wa-hist-search-icon {
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+.wa-hist-search-input {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 13px;
+  outline: none;
+  width: 100%;
+}
+
+.wa-hist-search-input::placeholder {
+  color: #64748b;
+}
+
+.wa-hist-clear-search {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.wa-hist-refresh-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.15s;
+}
+
+.wa-hist-refresh-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* ── History Table ───────────────────────────────────────────── */
+.wa-hist-table-container {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  min-height: 280px;
+}
+
+.wa-hist-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.wa-hist-table th {
+  background: rgba(255, 255, 255, 0.04);
+  color: #94a3b8;
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.wa-hist-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.15s ease;
+  cursor: pointer;
+}
+
+.wa-hist-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.wa-hist-table td {
+  padding: 12px 16px;
+  vertical-align: middle;
+}
+
+.wa-hist-cell-user {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wa-hist-user-name {
+  font-weight: 700;
+  color: #fff;
+}
+
+.wa-hist-user-phone {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.wa-hist-tpl-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.wa-hist-cell-preview {
+  max-width: 280px;
+}
+
+.wa-hist-preview-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.wa-hist-channel-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 5px;
+}
+
+.wa-hist-channel-tag--cloud {
+  background: rgba(37, 211, 102, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(37, 211, 102, 0.25);
+}
+
+.wa-hist-channel-tag--wame {
+  background: rgba(59, 130, 246, 0.12);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+/* ── Status Badges & Ticks ───────────────────────────────────── */
+.wa-hist-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.wa-hist-badge--sent {
+  background: rgba(148, 163, 184, 0.12);
+  color: #cbd5e1;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.wa-hist-badge--delivered {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.wa-hist-badge--read {
+  background: rgba(59, 130, 246, 0.14);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.wa-hist-badge--failed {
+  background: rgba(239, 68, 68, 0.14);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.wa-tick {
+  font-weight: 900;
+  letter-spacing: -2px;
+  margin-right: 2px;
+}
+
+.wa-tick--read {
+  color: #38bdf8;
+}
+
+.wa-tick--delivered {
+  color: #94a3b8;
+}
+
+.wa-tick--sent {
+  color: #64748b;
+}
+
+.wa-tick--failed {
+  color: #f87171;
+  letter-spacing: normal;
+}
+
+.wa-hist-cell-time {
+  color: #94a3b8;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.wa-hist-view-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wa-hist-view-btn:hover {
+  background: rgba(37, 211, 102, 0.15);
+  border-color: rgba(37, 211, 102, 0.4);
+  color: #25D366;
+}
+
+/* ── Empty & Loading States ──────────────────────────────────── */
+.wa-hist-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  gap: 8px;
+}
+
+.wa-hist-empty-icon {
+  font-size: 36px;
+  opacity: 0.7;
+}
+
+.wa-hist-empty h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.wa-hist-empty p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+  max-width: 360px;
+}
+
+.wa-hist-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #25D366;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Message Detail Modal ────────────────────────────────────── */
+.wa-hist-modal {
+  max-width: 540px !important;
+}
+
+.wa-hist-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px;
+}
+
+.wa-hist-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.wa-hist-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wa-hist-detail-item--full {
+  grid-column: span 2;
+}
+
+.wa-hist-detail-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 0.5px;
+}
+
+.wa-hist-detail-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.wa-hist-detail-code {
+  font-family: monospace;
+  font-size: 11px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #94a3b8;
+  word-break: break-all;
+}
+
+.wa-hist-detail-item--error .wa-hist-error-text {
+  font-size: 12px;
+  color: #f87171;
+  font-weight: 600;
+}
+
+.wa-hist-bubble-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wa-hist-bubble-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.wa-phone-tick--read {
+  color: #38bdf8 !important;
+}
+
+.wa-phone-tick--delivered {
+  color: #94a3b8 !important;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .wa-hist-metrics-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .wa-hist-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .wa-hist-search-box {
+    max-width: 100%;
+  }
+
+  .wa-hist-table-container {
+    overflow-x: auto;
+  }
+}

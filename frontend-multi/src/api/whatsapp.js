@@ -74,3 +74,15 @@ export const sendViaCloud = (shopId, templateId, customerId, extraVars, shopName
   api.post('/v2/whatsapp/send-cloud', { templateId, customerId, extraVars, shopName }, {
     headers: { 'x-shop-id': shopId },
   }).then(r => r.data);
+
+// ── Message History & Analytics ───────────────────────────────
+export const getMessageHistory = (shopId, params = {}) =>
+  api.get('/v2/whatsapp/history', {
+    headers: { 'x-shop-id': shopId },
+    params,
+  }).then(r => r.data.data);
+
+export const getHistoryStats = (shopId) =>
+  api.get('/v2/whatsapp/history/stats', {
+    headers: { 'x-shop-id': shopId },
+  }).then(r => r.data.data);

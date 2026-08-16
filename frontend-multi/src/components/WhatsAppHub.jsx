@@ -6,6 +6,7 @@ import {
   generateBulkLinks, sendViaCloud,
   getWhatsAppStatus, getAvailableWhatsAppNumbers, connectWhatsAppOAuth, disconnectWhatsApp,
 } from '../api/whatsapp';
+import WhatsAppHistory from './WhatsAppHistory';
 import './WhatsAppHub.css';
 
 const DELIVERY_MODE_KEY = 'wa_delivery_mode';
@@ -48,6 +49,8 @@ export default function WhatsAppHub({ shop }) {
   const shopName = shop?.shopName || shop?.facebook?.pageName || 'Shop';
 
   // ── State ────────────────────────────────────────────────────
+  const [activeTab, setActiveTab] = useState('composer'); // 'composer' | 'history'
+  const [lastSentTime, setLastSentTime] = useState(null);
   const [templates, setTemplates] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -346,6 +349,7 @@ export default function WhatsAppHub({ shop }) {
         await sendViaCloud(shopId, selectedTemplate.id, customer.id, extraVars, shopName);
         showSuccess(`✅ WhatsApp message sent to ${customer.name} via Cloud API!`);
       }
+      setLastSentTime(Date.now());
       setCustomers(prev => prev.map(c => c.id === customer.id ? { ...c, lastReminder: new Date().toISOString() } : c));
     } catch (err) {
       setError(err.response?.data?.error || err.message);
@@ -373,6 +377,7 @@ export default function WhatsAppHub({ shop }) {
         }
         showSuccess(`✅ Messages sent to ${selectedCustomerIds.size} customers via Cloud API!`);
       }
+      setLastSentTime(Date.now());
       setSelectedCustomerIds(new Set());
     } catch (err) {
       setError(err.response?.data?.error || err.message);
@@ -516,9 +521,30 @@ export default function WhatsAppHub({ shop }) {
         </div>
       </div>
 
-      <div className="wa-hub-body">
-        {/* ── LEFT PANEL: Customer Ledger ─────────────────────── */}
-        <div className="wa-ledger-panel">
+      {/* ── Sub-Navigation Tabs ──────────────────────────────── */}
+      <div className="wa-main-nav-tabs">
+        <button
+          type="button"
+          className={`wa-main-nav-btn ${activeTab === 'composer' ? 'wa-main-nav-btn--active' : ''}`}
+          onClick={() => setActiveTab('composer')}
+        >
+          ✉️ Notification Composer
+        </button>
+        <button
+          type="button"
+          className={`wa-main-nav-btn ${activeTab === 'history' ? 'wa-main-nav-btn--active' : ''}`}
+          onClick={() => setActiveTab('history')}
+        >
+          📜 Message History & Live Status
+        </button>
+      </div>
+
+      {activeTab === 'history' ? (
+        <WhatsAppHistory shopId={shopId} shopName={shopName} lastSentTime={lastSentTime} />
+      ) : (
+        <div className="wa-hub-body">
+          {/* ── LEFT PANEL: Customer Ledger ─────────────────────── */}
+          <div className="wa-ledger-panel">
           <div className="wa-ledger-toolbar">
             <div className="wa-ledger-title-row">
               <span className="wa-ledger-title">👥 Customer Ledger</span>
@@ -834,6 +860,7 @@ export default function WhatsAppHub({ shop }) {
           </div>
         </div>
       </div>
+      )}
 
       {/* ── CREATE TEMPLATE MODAL ─────────────────────────────── */}
       {showCreateTplModal && (

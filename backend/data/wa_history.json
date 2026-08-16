@@ -1,0 +1,21 @@
+{
+  "messages": [
+    {
+      "id": "msg_1786876375053_19ijm",
+      "wamid": null,
+      "shopId": "shop_461194823752748",
+      "recipientName": "chandan",
+      "recipientPhone": "7982296878",
+      "templateId": "meta_templete1",
+      "templateName": "☁️ templete1",
+      "renderedBody": "Hello, chandan,\n\nhow are you.",
+      "deliveryMode": "cloud",
+      "status": "failed",
+      "errorMessage": "(#200) You do not have the necessary permissions to send messages on behalf of this WhatsApp Business Account",
+      "sentAt": "2026-08-16T10:32:55.053Z",
+      "deliveredAt": null,
+      "readAt": null,
+      "updatedAt": "2026-08-16T10:32:55.053Z"
+    }
+  ]
+}
