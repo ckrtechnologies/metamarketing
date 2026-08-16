@@ -126,13 +126,24 @@ export default function App() {
     setActiveShopId(shopId);
     localStorage.setItem('active_shop_id', shopId);
     setShowSwitcher(false);
+
+    // Immediate local switch for fast UX
+    const localShop = shops.find(s => s.id === shopId);
+    if (localShop) {
+      setActiveShop(localShop);
+    }
+
     setLoading(true);
     try {
       const profile = await getShopProfile(shopId);
       setActiveShop(profile);
       setRefreshTrigger(n => n + 1);
     } catch (e) {
-      console.error('Error switching shop:', e);
+      console.warn('Error fetching live shop profile on switch, keeping cached data:', e);
+      if (localShop) {
+        setActiveShop(localShop);
+        setRefreshTrigger(n => n + 1);
+      }
     } finally {
       setLoading(false);
     }
@@ -154,6 +165,8 @@ export default function App() {
     }
   }
 
+  const currentShopKey = activeShop?.id || activeShop?.shopId || activeShopId || 'default';
+
   return (
     <div className="app-root">
       {/* If no active shop connected, show onboarding */}
@@ -167,8 +180,9 @@ export default function App() {
 
       {/* Main Dashboard for Connected Shop */}
       {activeShop && (
-        <div className="dashboard-container">
+        <div className="dashboard-container" key={currentShopKey}>
           <ShopHeader
+            key={`header_${currentShopKey}`}
             shop={activeShop}
             onOpenSwitcher={() => setShowSwitcher(true)}
             onDisconnect={handleDisconnectShop}
@@ -177,6 +191,7 @@ export default function App() {
           <div className="dashboard-grid">
             <div className="composer-column">
               <ShopComposer
+                key={`composer_${currentShopKey}`}
                 shop={activeShop}
                 onPosted={() => setRefreshTrigger(n => n + 1)}
               />
@@ -184,6 +199,7 @@ export default function App() {
 
             <div className="feeds-column">
               <ShopFeeds
+                key={`feeds_${currentShopKey}`}
                 shop={activeShop}
                 refreshTrigger={refreshTrigger}
               />

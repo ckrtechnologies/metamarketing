@@ -67,6 +67,31 @@
       },
       "instagram": null,
       "status": "active"
+    },
+    {
+      "id": "shop_102575931769350",
+      "createdAt": "2026-08-16T05:19:10.454Z",
+      "updatedAt": "2026-08-16T05:19:12.069Z",
+      "shopName": "Arun J Sharma",
+      "ownerName": "Chandan Mallik",
+      "ownerEmail": "",
+      "ownerMetaUserId": "984330234649917",
+      "facebook": {
+        "pageId": "102575931769350",
+        "pageName": "Arun J Sharma",
+        "pageAccessToken": "EAAXPZCkmpe14BSGYsp4lh5yWZBsxooCTbx8nukoX2hco6ZBSBGQCP8ZBe0mzDcb4HBdoC02MbXZC6uhHWH4F4Dj8ujXzxkHHQEaDiLTyUdErHsgbo8ik5Jriyq0VwDRsxOglKmxTKLdJEP7ZBw1MYM5eNV3fvhQRgXrRuvs0OJCWGn4bKC3OTm5vcdKf9R0MnVy1mJv4QZD",
+        "fanCount": 3797,
+        "pictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t39.30808-1/662300281_1588133806647524_2474772548955042479_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=108&ccb=1-7&_nc_sid=f907e8&_nc_ohc=uvJuCgh-BZUQ7kNvwEbu5Xj&_nc_oc=Adq7RMwBaumVUjCNI0DeUWz7l6lVCOHuAGCeSkxPkbHkxSPyhReIxSF6U33zyKBGWmw&_nc_zt=24&_nc_ht=scontent.fdel31-1.fna&edm=AJdBtusEAAAA&_nc_gid=4cXn_Yq_DKbvMC2BJuhA4w&_nc_tpa=Q5bMBQL2USGmoTAqSg-FQR_bJusmyQ4Pho1HLoNvZOKm7vtn2ESrbJqT72AXF97VCKw6ebLaYndtybE6JQ&oh=00_AQEQTCYCMoZmG9agVZI6bERQbAavQVRSVlFoOeMyNNz32g&oe=6A87112D"
+      },
+      "instagram": {
+        "igUserId": "17841447873515878",
+        "username": "arun_j_sharma",
+        "name": "Arun Sharma",
+        "profilePictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t51.82787-15/660065051_18086001473595784_5323363112444061946_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=7d201b&_nc_ohc=uiIVr0CLw10Q7kNvwFpimen&_nc_oc=Adrrwa0aVaNZcwXscUdwRl6GcdeZGSJ3cSC7vAcLOUNmlbiT1WQ9QCGlFiQIA8MBBJA&_nc_zt=23&_nc_ht=scontent.fdel31-1.fna&edm=AL-3X8kEAAAA&_nc_gid=wkQk5AbVJJgqM3BOIuaPlg&oh=00_AQFvIsFdRDtzAejGXIBSGPA3SiOkMnNaQSQUp7V1z5umhg&oe=6A87319B",
+        "followersCount": 198027,
+        "mediaCount": 841
+      },
+      "status": "active"
     }
   ]
 }
