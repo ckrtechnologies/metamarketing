@@ -3,6 +3,11 @@ const whatsappController = require('../controllers/whatsappController');
 
 const router = express.Router();
 
+// ── OAuth & Shop Connection (Embedded Signup) ─────────────────
+router.get('/status', whatsappController.getWhatsAppStatus);
+router.post('/oauth/callback', whatsappController.connectWhatsAppOAuth);
+router.post('/oauth/disconnect', whatsappController.disconnectWhatsApp);
+
 // ── Template Catalogue ────────────────────────────────────────
 router.get('/templates', whatsappController.getTemplates);
 router.post('/templates', whatsappController.createTemplate);
@@ -19,7 +24,7 @@ router.delete('/customers/:id', whatsappController.deleteCustomer);
 router.post('/send-link', whatsappController.generateWALink);
 router.post('/bulk-links', whatsappController.generateBulkLinks);
 
-// Mode B: Meta WhatsApp Cloud API (requires WHATSAPP_PHONE_NUMBER_ID + WHATSAPP_ACCESS_TOKEN in .env)
+// Mode B: Meta WhatsApp Cloud API (Multi-tenant or .env fallback)
 router.post('/send-cloud', whatsappController.sendViaCloud);
 
 module.exports = router;

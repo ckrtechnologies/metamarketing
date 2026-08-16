@@ -1,5 +1,6 @@
 const whatsappService = require('../services/whatsappService');
 const customerRepo = require('../repositories/customerRepository');
+const shopRepo = require('../repositories/shopRepository');
 
 // ── Extract shopId from header ─────────────────────────────────
 function getShopId(req) {
@@ -15,10 +16,129 @@ function formatError(err) {
   return { message: err.message || 'Unknown error.', code: 'INTERNAL_ERROR', raw: err.message };
 }
 
+// ── POST /api/v2/whatsapp/oauth/callback ───────────────────────
+// Embedded Signup Callback: Exchanges code for token & registers shop's WABA
+exports.connectWhatsAppOAuth = async (req, res) => {
+  try {
+    const shopId = getShopId(req);
+    const { code, wabaId, phoneNumberId } = req.body;
+
+    if (!shopId) return res.status(400).json({ success: false, error: 'Shop ID is required.', code: 'MISSING_SHOP_ID' });
+    if (!code) return res.status(400).json({ success: false, error: 'Authorization code is required.', code: 'MISSING_AUTH_CODE' });
+
+    const shop = shopRepo.findShopById(shopId);
+    if (!shop) return res.status(404).json({ success: false, error: 'Shop not found.', code: 'SHOP_NOT_FOUND' });
+
+    console.log(`[whatsapp:oauth] Exchanging auth code for shop "${shop.shopName}" (${shopId})...`);
+
+    // 1. Exchange code for long-lived system/user token
+    const tokenData = await whatsappService.exchangeCodeForWhatsAppToken(code);
+    const accessToken = tokenData.access_token;
+
+    // 2. Fetch live Phone Number metadata from Meta
+    let phoneMeta = {};
+    if (phoneNumberId) {
+      try {
+        phoneMeta = await whatsappService.fetchWhatsAppPhoneDetails(phoneNumberId, accessToken);
+      } catch (phoneErr) {
+        console.warn('[whatsapp:oauth] Could not fetch phone details:', phoneErr.response?.data?.error?.message || phoneErr.message);
+      }
+    }
+
+    // 3. Subscribe our app to the shop's WABA webhooks
+    if (wabaId) {
+      await whatsappService.subscribeWABAApp(wabaId, accessToken);
+    }
+
+    // 4. Save credentials to shop repository (shops.json)
+    const updatedShop = shopRepo.upsertShop({
+      ...shop,
+      whatsapp: {
+        connected: true,
+        wabaId: wabaId || null,
+        phoneNumberId: phoneNumberId || null,
+        displayPhoneNumber: phoneMeta.display_phone_number || null,
+        verifiedName: phoneMeta.verified_name || shop.shopName,
+        qualityRating: phoneMeta.quality_rating || 'UNKNOWN',
+        accessToken,
+        connectedAt: new Date().toISOString(),
+      },
+    });
+
+    console.log(`[whatsapp:oauth] ✅ WhatsApp connected for shop "${shop.shopName}" -> Phone: ${phoneMeta.display_phone_number || phoneNumberId}`);
+    res.json({
+      success: true,
+      message: `WhatsApp Business connected successfully for ${shop.shopName}!`,
+      shop: updatedShop,
+    });
+  } catch (err) {
+    const f = formatError(err);
+    console.error(`[whatsapp:oauth] Error connecting WhatsApp:`, f.raw);
+    res.status(500).json({ success: false, error: f.message, code: f.code });
+  }
+};
+
+// ── POST /api/v2/whatsapp/oauth/disconnect ─────────────────────
+// Disconnects WhatsApp Business account for this shop
+exports.disconnectWhatsApp = (req, res) => {
+  try {
+    const shopId = getShopId(req);
+    if (!shopId) return res.status(400).json({ success: false, error: 'Shop ID is required.', code: 'MISSING_SHOP_ID' });
+
+    const shop = shopRepo.findShopById(shopId);
+    if (!shop) return res.status(404).json({ success: false, error: 'Shop not found.', code: 'SHOP_NOT_FOUND' });
+
+    const updatedShop = shopRepo.upsertShop({
+      ...shop,
+      whatsapp: {
+        connected: false,
+        wabaId: null,
+        phoneNumberId: null,
+        displayPhoneNumber: null,
+        verifiedName: null,
+        accessToken: null,
+        disconnectedAt: new Date().toISOString(),
+      },
+    });
+
+    console.log(`[whatsapp:oauth] WhatsApp disconnected for shop "${shop.shopName}"`);
+    res.json({ success: true, message: 'WhatsApp disconnected successfully.', shop: updatedShop });
+  } catch (err) {
+    const f = formatError(err);
+    res.status(500).json({ success: false, error: f.message, code: f.code });
+  }
+};
+
+// ── GET /api/v2/whatsapp/status ───────────────────────────────
+// Returns the active WhatsApp connection status for this shop
+exports.getWhatsAppStatus = (req, res) => {
+  try {
+    const shopId = getShopId(req);
+    const config = whatsappService.getWhatsAppConfig(shopId);
+    const shop = shopId ? shopRepo.findShopById(shopId) : null;
+
+    res.json({
+      success: true,
+      data: {
+        connected: Boolean(config.phoneNumberId && config.accessToken),
+        isShopSpecific: config.isShopSpecific,
+        displayPhoneNumber: config.displayPhoneNumber || (config.phoneNumberId ? `ID: ${config.phoneNumberId}` : null),
+        verifiedName: config.verifiedName || shop?.shopName || null,
+        wabaId: config.wabaId || null,
+        phoneNumberId: config.phoneNumberId || null,
+      },
+    });
+  } catch (err) {
+    const f = formatError(err);
+    res.status(500).json({ success: false, error: f.message, code: f.code });
+  }
+};
+
 // ── GET /api/v2/whatsapp/templates ────────────────────────────
 exports.getTemplates = async (req, res) => {
   try {
-    const templates = await whatsappService.getAllTemplates();
+    const shopId = getShopId(req);
+    const templates = await whatsappService.getAllTemplates(shopId);
     res.json({ success: true, data: templates });
   } catch (err) {
     const f = formatError(err);
@@ -29,11 +149,12 @@ exports.getTemplates = async (req, res) => {
 // ── POST /api/v2/whatsapp/templates ───────────────────────────
 exports.createTemplate = async (req, res) => {
   try {
+    const shopId = getShopId(req);
     const { name, category, description, body, icon, submitToMeta } = req.body;
     if (!name || !name.trim()) return res.status(400).json({ success: false, error: 'Template name is required.' });
     if (!body || !body.trim()) return res.status(400).json({ success: false, error: 'Template message body is required.' });
 
-    const newTemplate = await whatsappService.createTemplate({ name, category, description, body, icon, submitToMeta });
+    const newTemplate = await whatsappService.createTemplate({ name, category, description, body, icon, submitToMeta }, shopId);
     res.status(201).json({ success: true, data: newTemplate, message: `Template "${newTemplate.name}" created.` });
   } catch (err) {
     const f = formatError(err);
@@ -133,7 +254,7 @@ exports.generateWALink = async (req, res) => {
     const customer = customers.find(c => c.id === customerId);
     if (!customer) return res.status(404).json({ success: false, error: 'Customer not found in this shop ledger.', code: 'CUSTOMER_NOT_FOUND' });
 
-    const template = await whatsappService.getTemplate(templateId);
+    const template = await whatsappService.getTemplate(templateId, shopId);
     const result = whatsappService.generateSingleWALink(customer, template, { shopName, ...extraVars });
 
     // Record that reminder was sent
@@ -167,7 +288,7 @@ exports.generateBulkLinks = async (req, res) => {
       return res.status(404).json({ success: false, error: 'None of the specified customers were found for this shop.', code: 'CUSTOMERS_NOT_FOUND' });
     }
 
-    const template = await whatsappService.getTemplate(templateId);
+    const template = await whatsappService.getTemplate(templateId, shopId);
     const results = whatsappService.generateBulkWALinks(selected, template, { shopName, ...extraVars });
 
     // Record reminder sent for all
@@ -196,7 +317,7 @@ exports.sendViaCloud = async (req, res) => {
     const customer = customers.find(c => c.id === customerId);
     if (!customer) return res.status(404).json({ success: false, error: 'Customer not found.', code: 'CUSTOMER_NOT_FOUND' });
 
-    const template = await whatsappService.getTemplate(templateId);
+    const template = await whatsappService.getTemplate(templateId, shopId);
     const renderedBody = whatsappService.renderTemplate(template, {
       customerName: customer.name,
       shopName,
@@ -225,10 +346,10 @@ exports.sendViaCloud = async (req, res) => {
         languageCode: template.language || 'en',
         parameters: finalParams,
       };
-      result = await whatsappService.sendViaCloudAPI(customer.phone, renderedBody, templateConfig);
+      result = await whatsappService.sendViaCloudAPI(customer.phone, renderedBody, templateConfig, shopId);
     } else {
       // Freeform rendered text message
-      result = await whatsappService.sendViaCloudAPI(customer.phone, renderedBody, null);
+      result = await whatsappService.sendViaCloudAPI(customer.phone, renderedBody, null, shopId);
     }
 
     customerRepo.recordReminderSent(shopId, customerId);

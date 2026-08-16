@@ -1,11 +1,31 @@
 import api from './client';
 
-// ── Template Catalogue ────────────────────────────────────────
-export const getTemplates = () =>
-  api.get('/v2/whatsapp/templates').then(r => r.data.data);
+// ── WhatsApp OAuth & Connection Status ────────────────────────
+export const getWhatsAppStatus = (shopId) =>
+  api.get('/v2/whatsapp/status', {
+    headers: { 'x-shop-id': shopId },
+  }).then(r => r.data.data);
 
-export const createTemplate = (data) =>
-  api.post('/v2/whatsapp/templates', data).then(r => r.data.data);
+export const connectWhatsAppOAuth = (shopId, { code, wabaId, phoneNumberId }) =>
+  api.post('/v2/whatsapp/oauth/callback', { code, wabaId, phoneNumberId }, {
+    headers: { 'x-shop-id': shopId },
+  }).then(r => r.data);
+
+export const disconnectWhatsApp = (shopId) =>
+  api.post('/v2/whatsapp/oauth/disconnect', {}, {
+    headers: { 'x-shop-id': shopId },
+  }).then(r => r.data);
+
+// ── Template Catalogue ────────────────────────────────────────
+export const getTemplates = (shopId) =>
+  api.get('/v2/whatsapp/templates', {
+    headers: { 'x-shop-id': shopId },
+  }).then(r => r.data.data);
+
+export const createTemplate = (data, shopId) =>
+  api.post('/v2/whatsapp/templates', data, {
+    headers: { 'x-shop-id': shopId },
+  }).then(r => r.data.data);
 
 export const deleteTemplate = (templateId) =>
   api.delete(`/v2/whatsapp/templates/${templateId}`).then(r => r.data);

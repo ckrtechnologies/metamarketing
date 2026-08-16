@@ -4,6 +4,7 @@ import {
   getCustomers, addCustomer,
   updateCustomer, deleteCustomer, generateWALink,
   generateBulkLinks, sendViaCloud,
+  getWhatsAppStatus, connectWhatsAppOAuth, disconnectWhatsApp,
 } from '../api/whatsapp';
 import './WhatsAppHub.css';
 
@@ -21,6 +22,27 @@ const COMMON_TAGS = [
   { tag: '{{discountPercent}}', label: 'Discount %' },
 ];
 
+// Helper: Dynamically load Facebook JavaScript SDK
+function loadFacebookSDK() {
+  return new Promise((resolve) => {
+    if (window.FB) return resolve(window.FB);
+    window.fbAsyncInit = function() {
+      window.FB.init({
+        appId: '985351387295564',
+        cookie: true,
+        xfbml: true,
+        version: 'v19.0',
+      });
+      resolve(window.FB);
+    };
+    if (document.getElementById('facebook-jssdk')) return;
+    const js = document.createElement('script');
+    js.id = 'facebook-jssdk';
+    js.src = 'https://connect.facebook.net/en_US/sdk.js';
+    document.body.appendChild(js);
+  });
+}
+
 export default function WhatsAppHub({ shop }) {
   const shopId = shop?.id || shop?.shopId;
   const shopName = shop?.shopName || shop?.facebook?.pageName || 'Shop';
@@ -33,12 +55,16 @@ export default function WhatsAppHub({ shop }) {
   const [extraVars, setExtraVars] = useState({});
   const [deliveryMode, setDeliveryMode] = useState(() => localStorage.getItem(DELIVERY_MODE_KEY) || 'wame');
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState({ customers: true, sending: false, creatingTpl: false });
+  const [loading, setLoading] = useState({ customers: true, sending: false, creatingTpl: false, oauth: false });
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [newCustomer, setNewCustomer] = useState({ name: '', phone: '', balanceDue: '', notes: '' });
+
+  // WhatsApp Connection & OAuth State
+  const [waStatus, setWaStatus] = useState({ connected: false, loading: true });
+  const embeddedSessionRef = useRef({ wabaId: null, phoneNumberId: null });
 
   // Template creation modal state
   const [showCreateTplModal, setShowCreateTplModal] = useState(false);
@@ -62,13 +88,110 @@ export default function WhatsAppHub({ shop }) {
       .finally(() => setLoading(l => ({ ...l, customers: false })));
   }, [shopId]);
 
-  useEffect(() => {
-    getTemplates().then(tpls => {
+  const loadTemplates = useCallback(() => {
+    getTemplates(shopId).then(tpls => {
       setTemplates(tpls);
       if (tpls.length > 0) setSelectedTemplate(tpls[0]);
     }).catch(console.error);
+  }, [shopId]);
+
+  const loadStatus = useCallback(() => {
+    if (!shopId) return;
+    getWhatsAppStatus(shopId)
+      .then(data => setWaStatus({ ...data, loading: false }))
+      .catch(() => setWaStatus({ connected: false, loading: false }));
+  }, [shopId]);
+
+  useEffect(() => {
+    loadTemplates();
     loadCustomers();
-  }, [loadCustomers]);
+    loadStatus();
+  }, [loadTemplates, loadCustomers, loadStatus]);
+
+  // ── Listen for Meta Embedded Signup PostMessage Events ───────
+  useEffect(() => {
+    function handleMetaMessage(event) {
+      if (event.origin !== 'https://www.facebook.com' && event.origin !== 'https://web.facebook.com') return;
+      try {
+        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        if (data?.type === 'WA_EMBEDDED_SIGNUP') {
+          console.log('[WhatsAppHub:OAuth] Received Meta Embedded Signup session event:', data);
+          if (data.event === 'FINISH') {
+            const { phone_number_id, waba_id } = data.data || {};
+            embeddedSessionRef.current = {
+              phoneNumberId: phone_number_id,
+              wabaId: waba_id,
+            };
+          }
+        }
+      } catch {
+        // Ignore non-JSON postMessages
+      }
+    }
+
+    window.addEventListener('message', handleMetaMessage);
+    return () => window.removeEventListener('message', handleMetaMessage);
+  }, []);
+
+  // ── Launch WhatsApp 1-Click Embedded Signup Modal ─────────────
+  async function handleConnectWhatsApp() {
+    setLoading(l => ({ ...l, oauth: true }));
+    setError(null);
+    try {
+      const FB = await loadFacebookSDK();
+
+      FB.login((response) => {
+        if (response.authResponse?.code || response.authResponse?.accessToken) {
+          const authCode = response.authResponse.code || response.authResponse.accessToken;
+          const { wabaId, phoneNumberId } = embeddedSessionRef.current;
+
+          connectWhatsAppOAuth(shopId, {
+            code: authCode,
+            wabaId,
+            phoneNumberId,
+          })
+            .then(res => {
+              showSuccess(`🎉 WhatsApp Business connected successfully for ${shopName}!`);
+              loadStatus();
+              loadTemplates();
+            })
+            .catch(err => {
+              setError(err.response?.data?.error || err.message);
+            })
+            .finally(() => setLoading(l => ({ ...l, oauth: false })));
+        } else {
+          setLoading(l => ({ ...l, oauth: false }));
+          if (response.status !== 'connected') {
+            console.log('[WhatsAppHub:OAuth] User closed or cancelled signup.');
+          }
+        }
+      }, {
+        config_id: '985351387295564',
+        response_type: 'code',
+        override_default_response_type: true,
+        scope: 'whatsapp_business_management,whatsapp_business_messaging',
+        extras: {
+          feature: 'whatsapp_embedded_signup',
+          version: 'v19.0',
+        },
+      });
+    } catch (err) {
+      setError(err.message);
+      setLoading(l => ({ ...l, oauth: false }));
+    }
+  }
+
+  // ── Disconnect WhatsApp ───────────────────────────────────────
+  async function handleDisconnectWhatsApp() {
+    if (!window.confirm(`Disconnect WhatsApp Business account from ${shopName}?`)) return;
+    try {
+      await disconnectWhatsApp(shopId);
+      showSuccess(`WhatsApp disconnected for ${shopName}.`);
+      loadStatus();
+    } catch (err) {
+      setError(err.response?.data?.error || err.message);
+    }
+  }
 
   // Reset extra vars when template changes
   useEffect(() => {
@@ -344,10 +467,61 @@ export default function WhatsAppHub({ shop }) {
             type="button"
             className={`wa-mode-btn ${deliveryMode === 'cloud' ? 'wa-mode-btn--active' : ''}`}
             onClick={() => { setDeliveryMode('cloud'); localStorage.setItem(DELIVERY_MODE_KEY, 'cloud'); }}
-            title="Requires WhatsApp Business API setup in .env"
+            title="Requires WhatsApp Business API setup in .env or 1-Click Connection"
           >
             ☁️ Cloud API
           </button>
+        </div>
+      </div>
+
+      {/* ── WhatsApp Business Connection Banner (1-Click Embedded Signup) ── */}
+      <div className={`wa-conn-banner ${waStatus.connected ? 'wa-conn-banner--active' : 'wa-conn-banner--idle'}`}>
+        <div className="wa-conn-info">
+          <div className="wa-conn-badge">
+            <span className={`wa-status-dot ${waStatus.connected ? 'wa-status-dot--green' : 'wa-status-dot--yellow'}`} />
+            <span className="wa-conn-label">
+              {waStatus.connected
+                ? `WhatsApp Business: ${waStatus.displayPhoneNumber || waStatus.verifiedName || 'Active Cloud API'}`
+                : 'WhatsApp Cloud API: Connect your number for cold outbound sends'}
+            </span>
+          </div>
+          <div className="wa-conn-subtext">
+            {waStatus.connected
+              ? `Automated notifications will dispatch directly via ${waStatus.verifiedName || shopName}'s official WhatsApp WABA.`
+              : 'Shopkeeper can connect their WhatsApp number in 30 seconds with 1-Click Meta Login (no tokens or developer setup needed).'}
+          </div>
+        </div>
+
+        <div className="wa-conn-actions">
+          {waStatus.connected ? (
+            <div className="wa-conn-btn-group">
+              <button
+                type="button"
+                className="wa-btn-reconnect"
+                onClick={handleConnectWhatsApp}
+                disabled={loading.oauth}
+                title="Switch or re-link phone number"
+              >
+                {loading.oauth ? '⏳' : '🔄 Switch Number'}
+              </button>
+              <button
+                type="button"
+                className="wa-btn-disconnect"
+                onClick={handleDisconnectWhatsApp}
+              >
+                Disconnect
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              className="wa-btn-connect-oauth"
+              onClick={handleConnectWhatsApp}
+              disabled={loading.oauth}
+            >
+              {loading.oauth ? '⏳ Opening Meta Login...' : '⚡ Connect WhatsApp Business (1-Click)'}
+            </button>
+          )}
         </div>
       </div>
 

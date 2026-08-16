@@ -1,13 +1,91 @@
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+const shopRepo = require('../repositories/shopRepository');
 
 const TEMPLATES_PATH = path.resolve(__dirname, '../../data/wa_templates.json');
 
+// ── Multi-Tenant Credentials Resolver ─────────────────────────
+// Resolves shop-specific WhatsApp credentials first, falling back to .env system defaults
+function getWhatsAppConfig(shopId = null) {
+  if (shopId) {
+    const shop = shopRepo.findShopById(shopId);
+    if (shop?.whatsapp?.connected && shop.whatsapp.phoneNumberId && shop.whatsapp.accessToken) {
+      return {
+        wabaId: shop.whatsapp.wabaId,
+        phoneNumberId: shop.whatsapp.phoneNumberId,
+        accessToken: shop.whatsapp.accessToken,
+        displayPhoneNumber: shop.whatsapp.displayPhoneNumber,
+        verifiedName: shop.whatsapp.verifiedName,
+        isShopSpecific: true,
+      };
+    }
+  }
+
+  return {
+    wabaId: process.env.WHATSAPP_BUSINESS_ACCOUNT_ID,
+    phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID,
+    accessToken: process.env.WHATSAPP_ACCESS_TOKEN,
+    displayPhoneNumber: null,
+    verifiedName: null,
+    isShopSpecific: false,
+  };
+}
+
+// ── OAuth: Exchange code for long-lived system/user token ──────
+async function exchangeCodeForWhatsAppToken(code) {
+  const appId = process.env.FACEBOOK_APP_ID;
+  const appSecret = process.env.FACEBOOK_APP_SECRET;
+
+  if (!appId || !appSecret) {
+    throw new Error('FACEBOOK_APP_ID and FACEBOOK_APP_SECRET must be configured in backend/.env');
+  }
+
+  const { data } = await axios.get('https://graph.facebook.com/v19.0/oauth/access_token', {
+    params: {
+      client_id: appId,
+      client_secret: appSecret,
+      code,
+    },
+  });
+
+  return data; // { access_token, token_type, expires_in }
+}
+
+// ── OAuth: Fetch Live Phone Number Details ────────────────────
+async function fetchWhatsAppPhoneDetails(phoneNumberId, accessToken) {
+  const { data } = await axios.get(`https://graph.facebook.com/v19.0/${phoneNumberId}`, {
+    params: {
+      fields: 'display_phone_number,verified_name,quality_rating,name_status,status',
+    },
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  return data;
+}
+
+// ── OAuth: Subscribe app to shop's WABA webhooks ──────────────
+async function subscribeWABAApp(wabaId, accessToken) {
+  try {
+    const { data } = await axios.post(
+      `https://graph.facebook.com/v19.0/${wabaId}/subscribed_apps`,
+      {},
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    return data;
+  } catch (err) {
+    console.warn(`[whatsappService:subscribeWABAApp] Subscription notice:`, err.response?.data?.error?.message || err.message);
+    return null;
+  }
+}
+
 // ── Fetch official templates from Meta WhatsApp Cloud API ────
-async function getMetaCloudTemplates() {
-  const wabaId = process.env.WHATSAPP_BUSINESS_ACCOUNT_ID;
-  const token = process.env.WHATSAPP_ACCESS_TOKEN;
+async function getMetaCloudTemplates(shopId = null) {
+  const { wabaId, accessToken: token } = getWhatsAppConfig(shopId);
 
   if (!wabaId || !token) return [];
 
@@ -47,12 +125,11 @@ async function getMetaCloudTemplates() {
 }
 
 // ── Submit a new template to Meta WhatsApp Cloud API ─────────
-async function submitTemplateToMeta({ name, category, body, language = 'en' }) {
-  const wabaId = process.env.WHATSAPP_BUSINESS_ACCOUNT_ID;
-  const token = process.env.WHATSAPP_ACCESS_TOKEN;
+async function submitTemplateToMeta({ name, category, body, language = 'en' }, shopId = null) {
+  const { wabaId, accessToken: token } = getWhatsAppConfig(shopId);
 
   if (!wabaId || !token) {
-    throw new Error('WHATSAPP_BUSINESS_ACCOUNT_ID and WHATSAPP_ACCESS_TOKEN must be configured in .env');
+    throw new Error('WhatsApp Business Account ID and Access Token must be configured in shop or .env');
   }
 
   // Meta template name must be lowercase alphanumeric and underscore only
@@ -116,9 +193,9 @@ function getLocalTemplates() {
   }
 }
 
-async function getAllTemplates() {
+async function getAllTemplates(shopId = null) {
   const local = getLocalTemplates();
-  const metaCloud = await getMetaCloudTemplates();
+  const metaCloud = await getMetaCloudTemplates(shopId);
 
   // Clean name helper e.g. "📢 templet2" -> "templet2"
   const cleanName = (str) => String(str || '').replace(/^[\uD800-\uDBFF\uDC00-\uDFFF\u2600-\u27BF\s]+/, '').trim().toLowerCase().replace(/[^a-z0-9_]/g, '_');
@@ -164,8 +241,8 @@ function saveTemplates(templates) {
   fs.writeFileSync(TEMPLATES_PATH, JSON.stringify(localOnly, null, 2), 'utf8');
 }
 
-async function getTemplate(templateId) {
-  const templates = await getAllTemplates();
+async function getTemplate(templateId, shopId = null) {
+  const templates = await getAllTemplates(shopId);
   const clean = String(templateId || '').toLowerCase().replace(/^meta_/, '');
   const tpl = templates.find(t =>
     t.id === templateId ||
@@ -180,7 +257,7 @@ async function getTemplate(templateId) {
 }
 
 // ── Create a new custom template ──────────────────────────────
-async function createTemplate({ name, category, description, body, icon = '📝', submitToMeta = false }) {
+async function createTemplate({ name, category, description, body, icon = '📝', submitToMeta = false }, shopId = null) {
   if (!name || !name.trim()) throw new Error('Template name is required.');
   if (!body || !body.trim()) throw new Error('Template message body is required.');
 
@@ -196,7 +273,7 @@ async function createTemplate({ name, category, description, body, icon = '📝'
   let metaResponse = null;
   if (submitToMeta) {
     try {
-      metaResponse = await submitTemplateToMeta({ name, category, body });
+      metaResponse = await submitTemplateToMeta({ name, category, body }, shopId);
       console.log(`[whatsappService] Template "${name}" submitted to Meta WABA:`, metaResponse);
     } catch (metaErr) {
       console.warn('[whatsappService] Could not submit to Meta:', metaErr.response?.data?.error?.message || metaErr.message);
@@ -278,13 +355,12 @@ function buildWAMeLink(phone, messageBody) {
 // ── Mode B: Meta WhatsApp Cloud API ──────────────────────────
 // Sends an official WhatsApp Template Message (delivered cold 24/7 without customer messaging first)
 // or free-form text if templateName is not provided.
-async function sendViaCloudAPI(phone, messageBody, templateConfig = null) {
-  const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
-  const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
+async function sendViaCloudAPI(phone, messageBody, templateConfig = null, shopId = null) {
+  const { phoneNumberId, accessToken } = getWhatsAppConfig(shopId);
 
   if (!phoneNumberId || !accessToken) {
     throw new Error(
-      'WhatsApp Cloud API not configured. Please set WHATSAPP_PHONE_NUMBER_ID and WHATSAPP_ACCESS_TOKEN in backend/.env'
+      'WhatsApp Cloud API not configured. Please connect WhatsApp Business in Dashboard or set WHATSAPP_PHONE_NUMBER_ID and WHATSAPP_ACCESS_TOKEN in backend/.env'
     );
   }
 
@@ -353,6 +429,10 @@ function generateBulkWALinks(customers, template, extraVars = {}) {
 }
 
 module.exports = {
+  getWhatsAppConfig,
+  exchangeCodeForWhatsAppToken,
+  fetchWhatsAppPhoneDetails,
+  subscribeWABAApp,
   getAllTemplates,
   getTemplate,
   createTemplate,

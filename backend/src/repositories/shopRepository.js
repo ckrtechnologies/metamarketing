@@ -105,6 +105,10 @@ function sanitizeShop(shop) {
     copy.facebook.hasToken = Boolean(copy.facebook.pageAccessToken);
     delete copy.facebook.pageAccessToken;
   }
+  if (copy.whatsapp) {
+    copy.whatsapp.hasToken = Boolean(copy.whatsapp.accessToken);
+    delete copy.whatsapp.accessToken;
+  }
   return copy;
 }
 
