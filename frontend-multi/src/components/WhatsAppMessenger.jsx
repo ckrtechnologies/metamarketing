@@ -60,12 +60,15 @@ export default function WhatsAppMessenger({ shopId, shopName, activePhone }) {
 
   useEffect(() => {
     loadConversations();
+    const interval = setInterval(() => {
+      loadConversations();
+    }, 3000);
+    return () => clearInterval(interval);
   }, [loadConversations]);
 
   // ── Load Selected Thread ─────────────────────────────────────
   const loadThread = useCallback(async (phone) => {
     if (!shopId || !phone) return;
-    setLoadingThread(true);
     try {
       const thread = await getChatMessages(shopId, phone);
       setActiveThread(thread);
@@ -87,12 +90,16 @@ export default function WhatsAppMessenger({ shopId, shopName, activePhone }) {
   useEffect(() => {
     if (selectedPhone) {
       loadThread(selectedPhone);
+      const threadInterval = setInterval(() => {
+        loadThread(selectedPhone);
+      }, 3000);
+      return () => clearInterval(threadInterval);
     }
   }, [selectedPhone, loadThread]);
 
   useEffect(() => {
     scrollToBottom();
-  }, [activeThread?.messages]);
+  }, [activeThread?.messages?.length]);
 
   // ── Send Freeform Reply ──────────────────────────────────────
   const handleSendText = async (e) => {
