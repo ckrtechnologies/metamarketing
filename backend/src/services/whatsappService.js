@@ -142,42 +142,38 @@ async function getMetaCloudTemplates(shopId = null) {
   const { wabaId, accessToken: token } = getWhatsAppConfig(shopId);
   if (!token) return [];
 
-  const candidateWabas = Array.from(new Set([wabaId, '1844231982837700', '469743566216329'].filter(Boolean)));
+  const activeWaba = wabaId || '469743566216329';
   const allTemplates = [];
 
-  for (const wid of candidateWabas) {
-    try {
-      const { data } = await axios.get(`https://graph.facebook.com/v19.0/${wid}/message_templates`, {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { limit: 50 },
-      });
+  try {
+    const { data } = await axios.get(`https://graph.facebook.com/v19.0/${activeWaba}/message_templates`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { limit: 50 },
+    });
 
-      (data.data || []).forEach(metaTpl => {
-        if (!allTemplates.some(t => t.metaName === metaTpl.name)) {
-          const bodyComp = metaTpl.components?.find(c => c.type === 'BODY');
-          const bodyText = bodyComp?.text || metaTpl.name;
-          const matches = bodyText.match(/\{\{([0-9]+)\}\}/g) || [];
-          const variables = matches.map((_, i) => `param_${i + 1}`);
+    (data.data || []).forEach(metaTpl => {
+      const bodyComp = metaTpl.components?.find(c => c.type === 'BODY');
+      const bodyText = bodyComp?.text || metaTpl.name;
+      const matches = bodyText.match(/\{\{([0-9]+)\}\}/g) || [];
+      const variables = matches.map((_, i) => `param_${i + 1}`);
 
-          allTemplates.push({
-            id: `meta_${metaTpl.name}`,
-            metaName: metaTpl.name,
-            name: `☁️ ${metaTpl.name}`,
-            category: metaTpl.category?.toLowerCase() || 'general',
-            description: `Official Meta Cloud Template (${metaTpl.status})`,
-            variables: variables.length > 0 ? ['customerName', ...variables.slice(1)] : [],
-            paramCount: matches.length,
-            body: bodyText,
-            isMetaOfficial: true,
-            metaStatus: metaTpl.status,
-            language: metaTpl.language,
-            wabaId: wid,
-          });
-        }
+      allTemplates.push({
+        id: `meta_${metaTpl.name}`,
+        metaName: metaTpl.name,
+        name: `☁️ ${metaTpl.name}`,
+        category: metaTpl.category?.toLowerCase() || 'general',
+        description: `Official Meta Cloud Template (${metaTpl.status})`,
+        variables: variables.length > 0 ? ['customerName', ...variables.slice(1)] : [],
+        paramCount: matches.length,
+        body: bodyText,
+        isMetaOfficial: true,
+        metaStatus: metaTpl.status,
+        language: metaTpl.language,
+        wabaId: activeWaba,
       });
-    } catch (err) {
-      // Ignore individual WABA error
-    }
+    });
+  } catch (err) {
+    console.warn(`[whatsappService:getMetaCloudTemplates] Failed for WABA ${activeWaba}:`, err.response?.data?.error?.message || err.message);
   }
 
   return allTemplates;
