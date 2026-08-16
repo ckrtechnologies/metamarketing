@@ -1,0 +1,148 @@
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(24,119,242,0.06) 50%, rgba(214,36,159,0.06) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+  flex-wrap: wrap;
+}
+
+.platform-profile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  min-width: 240px;
+}
+
+.platform-profile__avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.platform-profile__avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-2);
+}
+
+.platform-profile__avatar--ig {
+  border-color: #d6249f;
+  background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+}
+
+.platform-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  background: var(--surface);
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.platform-badge--ig {
+  background: #d6249f;
+}
+
+.ig-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.platform-profile__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.platform-profile__name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.platform-profile__name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+.platform-tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.platform-tag--fb {
+  background: rgba(24,119,242,0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(24,119,242,0.3);
+}
+
+.platform-tag--ig {
+  background: rgba(214,36,159,0.15);
+  color: #f472b6;
+  border: 1px solid rgba(214,36,159,0.3);
+}
+
+.platform-profile__followers {
+  font-size: 12.5px;
+  color: var(--text-2);
+}
+
+.header-divider {
+  width: 1px;
+  height: 44px;
+  background: var(--border);
+}
+
+@media (max-width: 800px) {
+  .header-divider { display: none; }
+}
+
+.page-header__status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--success);
+  background: rgba(34,197,94,0.1);
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(34,197,94,0.2);
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.8); }
+}
