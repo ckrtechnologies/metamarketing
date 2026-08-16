@@ -122,6 +122,7 @@ export default function App() {
     try {
       const profile = await getShopProfile(shopId);
       setActiveShop(profile);
+      setRefreshTrigger(n => n + 1);
     } catch (e) {
       console.error('Error switching shop:', e);
     } finally {
