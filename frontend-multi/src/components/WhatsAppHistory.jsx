@@ -154,7 +154,7 @@ export default function WhatsAppHistory({ shopId, shopName, lastSentTime }) {
           <div className="wa-hist-metric-icon wa-hist-metric-icon--green">📬</div>
           <div className="wa-hist-metric-info">
             <span className="wa-hist-metric-val">{stats.delivered + stats.read}</span>
-            <span className="wa-hist-metric-label">Delivered ({stats.deliveryRate}%)</span>
+            <span className="wa-hist-metric-label">Confirmed Delivered ({stats.deliveryRate}%)</span>
           </div>
         </div>
 
@@ -174,6 +174,37 @@ export default function WhatsAppHistory({ shopId, shopName, lastSentTime }) {
           </div>
         </div>
       </div>
+
+      {/* ── DELIVERY DIAGNOSTIC BANNER ────────────────────── */}
+      {stats.sent > 0 && stats.delivered === 0 && (
+        <div style={{
+          background: 'rgba(234, 179, 8, 0.1)',
+          border: '1px solid rgba(234, 179, 8, 0.25)',
+          borderRadius: '10px',
+          padding: '12px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          color: '#fef08a',
+          fontSize: '12.5px',
+          gap: '12px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '18px' }}>⚠️</span>
+            <span>
+              <strong>{stats.sent} messages are currently queued (Awaiting Device):</strong> Meta Cloud API accepted the request, but delivery to customer phones is held because sender display name for <code>+91 89209 32354</code> was rejected on Meta WhatsApp Manager.
+            </span>
+          </div>
+          <button
+            type="button"
+            className="wa-report-action-btn"
+            onClick={() => setShowReportModal(true)}
+            style={{ flexShrink: 0, padding: '4px 10px', fontSize: '11.5px' }}
+          >
+            📊 View Full Report
+          </button>
+        </div>
+      )}
 
       {/* ── CONTROLS & FILTER BAR ──────────────────────────── */}
       <div className="wa-hist-toolbar">
