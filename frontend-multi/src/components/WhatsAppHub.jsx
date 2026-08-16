@@ -48,6 +48,7 @@ export default function WhatsAppHub({ shop }) {
     description: '',
     body: '',
     icon: '📢',
+    submitToMeta: true,
   });
   const bodyTextareaRef = useRef(null);
 
@@ -198,7 +199,7 @@ export default function WhatsAppHub({ shop }) {
       setTemplates(prev => [...prev, created]);
       setSelectedTemplate(created);
       setShowCreateTplModal(false);
-      setNewTpl({ name: '', category: 'promotion', description: '', body: '', icon: '📢', submitToMeta: false });
+      setNewTpl({ name: '', category: 'promotion', description: '', body: '', icon: '📢', submitToMeta: true });
       showSuccess(`✅ Template "${created.name}" created!`);
     } catch (err) {
       setError(err.response?.data?.error || err.message);

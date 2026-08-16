@@ -77,5 +77,19 @@
     "body": "Hello {{customerName}},\n\nhow are you?\nyouu due is {{amount}} on {{dueDate}}\npls complete the payment.",
     "isCustom": true,
     "createdAt": "2026-08-16T08:29:46.123Z"
+  },
+  {
+    "id": "custom_1786870722840_templet2",
+    "name": "📢 templet2",
+    "category": "promotion",
+    "description": "Custom promotion template",
+    "variables": [
+      "customerName",
+      "offerDetails"
+    ],
+    "body": "hello, {{customerName}},\n\nuse code {{offerDetails}} for 10% discoune.\n\nthanks.",
+    "isCustom": true,
+    "submittedToMeta": false,
+    "createdAt": "2026-08-16T08:58:42.840Z"
   }
 ]
