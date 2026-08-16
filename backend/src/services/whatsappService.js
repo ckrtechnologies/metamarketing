@@ -261,7 +261,7 @@ async function getAllTemplates(shopId = null) {
 async function getTemplate(templateId, shopId = null) {
   const templates = await getAllTemplates(shopId);
   const clean = String(templateId || '').toLowerCase().replace(/^meta_/, '');
-  const tpl = templates.find(t =>
+  let tpl = templates.find(t =>
     t.id === templateId ||
     t.metaName === templateId ||
     t.metaName === clean ||
@@ -269,6 +269,39 @@ async function getTemplate(templateId, shopId = null) {
     t.id.toLowerCase().includes(`_${clean}`) ||
     t.name.toLowerCase().includes(clean)
   );
+
+  // If not found in active WABA catalog, search other linked WABA catalogs as fallback
+  if (!tpl) {
+    const candidateWabas = ['1844231982837700', '469743566216329'];
+    const { accessToken: token } = getWhatsAppConfig(shopId);
+    for (const wid of candidateWabas) {
+      try {
+        const { data } = await axios.get(`https://graph.facebook.com/v19.0/${wid}/message_templates`, {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { limit: 50 },
+        });
+        const found = (data.data || []).find(m => m.name.toLowerCase() === clean || m.name.toLowerCase() === templateId.toLowerCase());
+        if (found) {
+          const bodyComp = found.components?.find(c => c.type === 'BODY');
+          const bodyText = bodyComp?.text || found.name;
+          const matches = bodyText.match(/\{\{([0-9]+)\}\}/g) || [];
+          tpl = {
+            id: `meta_${found.name}`,
+            metaName: found.name,
+            name: `☁️ ${found.name}`,
+            category: found.category?.toLowerCase() || 'general',
+            body: bodyText,
+            isMetaOfficial: true,
+            metaStatus: found.status,
+            language: found.language,
+            wabaId: wid,
+          };
+          break;
+        }
+      } catch {}
+    }
+  }
+
   if (!tpl) throw new Error(`Template "${templateId}" not found in Meta Cloud API.`);
   return tpl;
 }

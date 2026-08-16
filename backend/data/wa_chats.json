@@ -5,9 +5,9 @@
       "shopId": "shop_461194823752748",
       "customerPhone": "7982296878",
       "customerName": "Chandan Mallik",
-      "unreadCount": 1,
-      "lastMessage": "Hi Chandan! Yes, we would be delighted to assist you. Your current invoice balance is cleared and your appointment is confirmed for tomorrow 11 AM.",
-      "lastMessageAt": "2026-08-16T11:34:49.980Z",
+      "unreadCount": 0,
+      "lastMessage": "hello, Chandan,\n\nhow are you,\npls clear your bill.",
+      "lastMessageAt": "2026-08-16T11:36:51.491Z",
       "lastInboundAt": "2026-08-16T11:34:45.000Z",
       "messages": [
         {
@@ -27,10 +27,37 @@
           "templateName": null,
           "status": "sent",
           "timestamp": "2026-08-16T11:34:49.980Z"
+        },
+        {
+          "id": "msg_out_1786880114539_4ev2",
+          "wamid": "wamid.HBgMOTE3OTgyMjk2ODc4FQIAERgSOTA0M0M5QjUxRTUyMzA1MkE4AA==",
+          "direction": "outbound",
+          "text": "ok",
+          "templateName": null,
+          "status": "sent",
+          "timestamp": "2026-08-16T11:35:14.539Z"
+        },
+        {
+          "id": "msg_out_1786880140956_9vy0",
+          "wamid": "wamid.HBgMOTE3OTgyMjk2ODc4FQIAERgSRkJCMzYzRTA0MThGNzczMTQ5AA==",
+          "direction": "outbound",
+          "text": "Your payment is confirmed. Thank you!",
+          "templateName": null,
+          "status": "sent",
+          "timestamp": "2026-08-16T11:35:40.956Z"
+        },
+        {
+          "id": "msg_out_1786880211492_afqe",
+          "wamid": "wamid.HBgMOTE3OTgyMjk2ODc4FQIAERgSMTY4MTBDOEVEQTU5MzE1MzE2AA==",
+          "direction": "outbound",
+          "text": "hello, Chandan,\n\nhow are you,\npls clear your bill.",
+          "templateName": "☁️ test2",
+          "status": "sent",
+          "timestamp": "2026-08-16T11:36:51.491Z"
         }
       ],
       "createdAt": "2026-08-16T11:34:45.000Z",
-      "updatedAt": "2026-08-16T11:34:49.980Z"
+      "updatedAt": "2026-08-16T11:36:51.491Z"
     }
   }
 }

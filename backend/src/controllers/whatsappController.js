@@ -657,10 +657,15 @@ exports.sendReply = async (req, res) => {
         ...extraVars,
       });
 
+      const rawParams = [customerName || 'Customer', ...Object.values(extraVars)];
+      const matches = (template.body || '').match(/\{\{([0-9]+)\}\}/g) || [];
+      const requiredParamCount = matches.length;
+      const parameters = rawParams.slice(0, requiredParamCount);
+
       const templateConfig = {
         templateName: template.metaName || template.id.replace(/^meta_/, ''),
         languageCode: template.language || 'en',
-        parameters: Object.values(extraVars),
+        parameters,
         wabaId: template.wabaId,
       };
 
