@@ -28,7 +28,7 @@ function loadFacebookSDK() {
     if (window.FB) return resolve(window.FB);
     window.fbAsyncInit = function() {
       window.FB.init({
-        appId: '985351387295564',
+        appId: import.meta.env.VITE_FB_APP_ID || '1636065948040030',
         cookie: true,
         xfbml: true,
         version: 'v19.0',
@@ -166,9 +166,6 @@ export default function WhatsAppHub({ shop }) {
           }
         }
       }, {
-        config_id: '985351387295564',
-        response_type: 'code',
-        override_default_response_type: true,
         scope: 'whatsapp_business_management,whatsapp_business_messaging',
         extras: {
           feature: 'whatsapp_embedded_signup',
