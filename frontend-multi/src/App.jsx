@@ -54,14 +54,22 @@ export default function App() {
       const data = await listShops();
       setShops(data || []);
 
-      const currentId = localStorage.getItem('active_shop_id') || data[0]?.id;
-      if (currentId) {
-        setActiveShopId(currentId);
-        localStorage.setItem('active_shop_id', currentId);
-        const profile = await getShopProfile(currentId);
-        setActiveShop(profile);
+      const savedId = localStorage.getItem('active_shop_id');
+      const validShop = data?.find(s => s.id === savedId) || data?.[0];
+
+      if (validShop) {
+        setActiveShopId(validShop.id);
+        localStorage.setItem('active_shop_id', validShop.id);
+        try {
+          const profile = await getShopProfile(validShop.id);
+          setActiveShop(profile);
+        } catch (profileErr) {
+          console.warn('Could not fetch live profile, using stored shop data:', profileErr);
+          setActiveShop(validShop);
+        }
       } else {
         setActiveShop(null);
+        localStorage.removeItem('active_shop_id');
       }
     } catch (err) {
       console.error('Failed to load shops:', err);

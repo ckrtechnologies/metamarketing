@@ -1,21 +1,28 @@
 {
   "shops": [
     {
-      "id": "shop_1146578318542257",
-      "createdAt": "2026-08-16T05:09:15.537Z",
-      "updatedAt": "2026-08-16T05:10:23.690Z",
-      "shopName": "Healthy Manushya",
+      "id": "shop_461194823752748",
+      "createdAt": "2026-08-16T05:12:39.648Z",
+      "updatedAt": "2026-08-16T05:13:25.343Z",
+      "shopName": "CKR Technologies",
       "ownerName": "Chandan Mallik",
       "ownerEmail": "",
       "ownerMetaUserId": "984330234649917",
       "facebook": {
-        "pageId": "1146578318542257",
-        "pageName": "Healthy Manushya",
-        "pageAccessToken": "EAAXPZCkmpe14BSGBRzKsWhTqLUENCG9gJK1NUMNnZBJMv5WwYPgolkj7JlpvgIXzgMzul8cyUknRT2FT5buY0gBRe1C5N5vHcVHn6lnXWnHD9lbSX5jHT4yiVfqRNZBp1eF6HE1goEXX4PZAsOLPoZCaRcyHFd12XscqQudmQIEfmgfciFUomTJdDklM5WXV5ZA4Sckztt",
-        "fanCount": 0,
-        "pictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t39.30808-1/733499692_122102275563368418_730264582336541047_n.jpg?stp=c152.152.410.410a_dst-jpg_s200x200_tt6&_nc_cat=101&ccb=1-7&_nc_sid=f907e8&_nc_ohc=4H522OMSqX4Q7kNvwHMC0sw&_nc_oc=AdoWntb5_EPbf_G8iHrfmTWHdcVd3r1fP_Az_-h6wxsgs6FUgI4PxzUmguIMSVMfTyY&_nc_zt=24&_nc_ht=scontent.fdel31-1.fna&edm=AJdBtusEAAAA&_nc_gid=B2VqHisHfUmuVJAGEHu7Dg&_nc_tpa=Q5bMBQKKR6CFK0AFuf8tEtil1bL6ifYzf3OgODVLZvUqEOkJY3fh6a1SAIOn4lBFyWIFuDjUn93mwZgVqA&oh=00_AQFnEB-swuSHQ61AaZ1ONC89CkoLGeuk1BuddNoW-cR19A&oe=6A87086D"
+        "pageId": "461194823752748",
+        "pageName": "CKR Technologies",
+        "pageAccessToken": "EAAXPZCkmpe14BSMswVrRZCfFr5xvT6REOa30t9g3QeIFRjvNRxPM1k93EMXywmEa7HyUibAlGxNdXT5gV3oNdjl7KzBeyLwmjhoFFBVswcqfRfDNkWT4sJ0KCaAaCHgYG04ytSAf3SQ7Xr0bAM7If2VzNwugzSTEb3wc6MGoxi63NzePut9esM4h68fcrwVZAaF",
+        "fanCount": 1096,
+        "pictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t39.30808-1/754143337_122169797786700192_6222183288504723018_n.jpg?stp=c274.0.790.791a_dst-jpg_s200x200_tt6&_nc_cat=110&ccb=1-7&_nc_sid=f907e8&_nc_ohc=bP0Ywp0ZtegQ7kNvwFJ_Rdg&_nc_oc=AdqsRSgmKqxYwXveOpV9sZ9torIYOVMHsv5tntLPDLbT1p0A43h7cJlo3WPxLrXVNkg&_nc_zt=24&_nc_ht=scontent.fdel31-1.fna&edm=AJdBtusEAAAA&_nc_gid=jvbPTxv2oGB399eAXhiPYg&_nc_tpa=Q5bMBQJHtm_7rHxAd9TqTp8eVe1dnvSl8q40awAnDD2tqthpQUhuhxP5Kp1mR6XJOHFppiodItO9pnO0DQ&oh=00_AQH3dlNwKv09a6YlgEXundYHrwliIKOwIM68NXgk85vWCw&oe=6A86FFCD"
       },
-      "instagram": null,
+      "instagram": {
+        "igUserId": "17841471645943814",
+        "username": "argosmob_tech",
+        "name": "ArgosMob Tech & AI Pvt LTD",
+        "profilePictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t51.2885-15/470737682_1260820858528041_7812594431915758742_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=7d201b&_nc_ohc=PAnzvwz9178Q7kNvwF8d2Wc&_nc_oc=AdrLpZaMYExFnvBgSNClMfBgNvkXuJ9LrdSz7AZ9PknlrC41C0Uh65Z9Bz5qsXPNcH8&_nc_zt=23&_nc_ht=scontent.fdel31-1.fna&edm=AL-3X8kEAAAA&oh=00_AQEJYZfReFMGb8I2kHMnwom9veEJoDvVCwuMJOo3C6JAPQ&oe=6A8703E7",
+        "followersCount": 476,
+        "mediaCount": 24
+      },
       "status": "active"
     }
   ]

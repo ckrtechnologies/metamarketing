@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const morgan = require('morgan');
 const path = require('path');
 const fs = require('fs');
 
@@ -17,6 +18,11 @@ const uploadDir = process.env.UPLOAD_DIR || 'uploads';
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
+
+// ── HTTP Request Logging (Morgan) ────────────────────────────
+// Custom token to log active shop ID
+morgan.token('shop-id', (req) => req.headers['x-shop-id'] ? `[Shop: ${req.headers['x-shop-id']}]` : '[No Shop]');
+app.use(morgan(':method :url :status :response-time ms - :res[content-length] :shop-id'));
 
 // ── Middleware ────────────────────────────────────────────────
 app.use(cors({
