@@ -546,13 +546,12 @@ exports.handleWebhook = (req, res) => {
       (body.entry || []).forEach(entry => {
         (entry.changes || []).forEach(change => {
           const value = change.value;
-          if (value?.statuses) {
-            value.statuses.forEach(st => {
               const wamid = st.id;
               const status = st.status; // 'sent' | 'delivered' | 'read' | 'failed'
               const timestamp = st.timestamp ? new Date(parseInt(st.timestamp, 10) * 1000).toISOString() : null;
-              console.log(`[whatsapp:webhook] Status update: ${wamid} -> ${status}`);
-              historyRepo.updateMessageStatus(wamid, status, timestamp);
+              const errorMsg = st.errors && st.errors.length > 0 ? (st.errors[0].title || st.errors[0].message || `Error code ${st.errors[0].code}`) : null;
+              console.log(`[whatsapp:webhook] Status update: ${wamid} -> ${status}${errorMsg ? ` (${errorMsg})` : ''}`);
+              historyRepo.updateMessageStatus(wamid, status, timestamp, errorMsg);
             });
           }
         });

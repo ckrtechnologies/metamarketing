@@ -56,13 +56,14 @@ function recordMessage(shopId, messageData) {
 /**
  * Update message status by Meta WAMID (webhook callback) or ID
  */
-function updateMessageStatus(wamidOrId, newStatus, timestamp = null) {
+function updateMessageStatus(wamidOrId, newStatus, timestamp = null, errorMessage = null) {
   const data = readData();
   const msg = data.messages.find(m => m.wamid === wamidOrId || m.id === wamidOrId);
   if (!msg) return null;
 
   msg.status = newStatus;
   msg.updatedAt = new Date().toISOString();
+  if (errorMessage) msg.errorMessage = errorMessage;
 
   if (newStatus === 'delivered' && !msg.deliveredAt) {
     msg.deliveredAt = timestamp || new Date().toISOString();
