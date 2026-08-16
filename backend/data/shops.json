@@ -3,7 +3,7 @@
     {
       "id": "shop_461194823752748",
       "createdAt": "2026-08-16T11:11:19.378Z",
-      "updatedAt": "2026-08-16T11:12:38.113Z",
+      "updatedAt": "2026-08-16T11:13:38.827Z",
       "shopName": "CKR Technologies",
       "ownerName": "Chandan Mallik",
       "ownerEmail": "",
@@ -13,7 +13,7 @@
         "pageName": "CKR Technologies",
         "pageAccessToken": "EAAXPZCkmpe14BSKrAM1gZCpEaEP6DZBepBPymagWZArL1zrSYvGpGPZA5JQd8U9l2mg6nIxojOHNGYMhCiT653O8sO9sJpiuDtAT0ppROp5Q1gRZAOsaQg9lv1ECdZAL6cFVetmEX1PqhsKeivktZAfvgvCOQF7HXqDgU9gnZAwj49x7qRx1ZA1koYz0FpB9Cmv2cuH7Yaqdb1",
         "fanCount": 1096,
-        "pictureUrl": "https://scontent-del3-2.xx.fbcdn.net/v/t39.30808-1/754143337_122169797786700192_6222183288504723018_n.jpg?stp=c274.0.790.791a_dst-jpg_s200x200_tt6&_nc_cat=110&ccb=1-7&_nc_sid=f907e8&_nc_ohc=bP0Ywp0ZtegQ7kNvwHnC27-&_nc_oc=AdpZVrx0bJzFyn328eehfrnd5o6acfWiebb9LqzH8BC3BKF3DlmtLjX7NZGU6wI0PoE&_nc_zt=24&_nc_ht=scontent-del3-2.xx&edm=AJdBtusEAAAA&_nc_gid=Pg8Kwxt8oTXtYXEzUQ-jqA&_nc_tpa=Q5bMBQKiQ5DwEUgN83pNJ9wCFB__eqQsDYJ8inote97dFBJXaOdqLWPbb5hHXTymdnzDw3YrjFLuEclgJQ&oh=00_AQGRR9o8X9ORXcq9ggvaOY3XioQiT02eDAbD2i3TKMT6Fw&oe=6A87704D"
+        "pictureUrl": "https://scontent-del3-2.xx.fbcdn.net/v/t39.30808-1/754143337_122169797786700192_6222183288504723018_n.jpg?stp=c274.0.790.791a_dst-jpg_s200x200_tt6&_nc_cat=110&ccb=1-7&_nc_sid=f907e8&_nc_ohc=bP0Ywp0ZtegQ7kNvwHnC27-&_nc_oc=AdpZVrx0bJzFyn328eehfrnd5o6acfWiebb9LqzH8BC3BKF3DlmtLjX7NZGU6wI0PoE&_nc_zt=24&_nc_ht=scontent-del3-2.xx&edm=AJdBtusEAAAA&_nc_gid=-0ef-UzISYSTTPakUFQeLg&_nc_tpa=Q5bMBQKVKkbhdnrEIucRx6SvOtOEB4tSvqn7mmhDtD3sRXET-BYL3wg30n2ry4Coce5m9dO4vrU4FmpRkA&oh=00_AQGNDEtJrfsSRt1a5IoUNLn4BvYqFprRmJDkKEVmljow4A&oe=6A87704D"
       },
       "instagram": {
         "igUserId": "17841471645943814",
@@ -26,13 +26,13 @@
       "status": "active",
       "whatsapp": {
         "connected": true,
-        "wabaId": "469743566216329",
-        "phoneNumberId": "443930708804530",
-        "displayPhoneNumber": "+91 78140 51127",
-        "verifiedName": "Dr Vineet Chadha",
+        "wabaId": "1844231982837700",
+        "phoneNumberId": "1076671092207220",
+        "displayPhoneNumber": "+91 89209 32354",
+        "verifiedName": "Stenna",
         "qualityRating": "GREEN",
         "accessToken": "EAANZBQCrNrfsBSEZBZC945SLeW6Y1XN5JTkis1zgCpmFO85wUQEx2p4NZCBNnmUISsRfHWeaZAWocZCnLioENNJNLzGiowhu7og7DiUAxzcZBKzyNxLTqvfEzb897YEbzZCXTo2xvRuNgHMuFZB6TF3UZBCgL0VdMwc4ZClgE5FjlAIroxxEw2P0LlsZBxjiZCq7xHgZDZD",
-        "connectedAt": "2026-08-16T11:12:38.112Z"
+        "connectedAt": "2026-08-16T11:13:34.452Z"
       }
     }
   ]

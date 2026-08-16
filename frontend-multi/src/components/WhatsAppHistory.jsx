@@ -29,6 +29,10 @@ export default function WhatsAppHistory({ shopId, shopName, lastSentTime }) {
 
   useEffect(() => {
     loadData();
+    const interval = setInterval(() => {
+      loadData();
+    }, 4000);
+    return () => clearInterval(interval);
   }, [loadData, lastSentTime]);
 
   const formatDate = (isoString) => {
