@@ -408,6 +408,7 @@ exports.sendViaCloud = async (req, res) => {
         templateName: template.metaName || template.id.replace(/^meta_/, ''),
         languageCode: template.language || 'en',
         parameters: finalParams,
+        wabaId: template.wabaId,
       };
       result = await whatsappService.sendViaCloudAPI(customer.phone, renderedBody, templateConfig, shopId);
     } else {

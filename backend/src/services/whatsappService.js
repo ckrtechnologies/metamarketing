@@ -372,10 +372,17 @@ async function sendViaCloudAPI(phone, messageBody, templateConfig = null, shopId
     );
   }
 
+  let activePhoneId = phoneNumberId;
+  if (templateConfig?.wabaId === '1844231982837700') {
+    activePhoneId = '1076671092207220';
+  } else if (templateConfig?.wabaId === '469743566216329') {
+    activePhoneId = '443930708804530';
+  }
+
   let normalizedPhone = String(phone).replace(/\D/g, '');
   if (normalizedPhone.length === 10) normalizedPhone = '91' + normalizedPhone;
 
-  const url = `https://graph.facebook.com/v19.0/${phoneNumberId}/messages`;
+  const url = `https://graph.facebook.com/v19.0/${activePhoneId}/messages`;
 
   let payload;
 
@@ -387,7 +394,7 @@ async function sendViaCloudAPI(phone, messageBody, templateConfig = null, shopId
       type: 'template',
       template: {
         name: templateConfig.templateName,
-        language: { code: templateConfig.languageCode || 'en_US' },
+        language: { code: templateConfig.languageCode || 'en' },
         ...(templateConfig.parameters && templateConfig.parameters.length > 0 ? {
           components: [
             {
