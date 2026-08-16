@@ -2,6 +2,7 @@ const whatsappService = require('../services/whatsappService');
 const customerRepo = require('../repositories/customerRepository');
 const shopRepo = require('../repositories/shopRepository');
 const historyRepo = require('../repositories/historyRepository');
+const chatRepo = require('../repositories/chatRepository');
 
 // ── Extract shopId from header ─────────────────────────────────
 function getShopId(req) {
@@ -538,14 +539,49 @@ exports.verifyWebhook = (req, res) => {
   return res.sendStatus(403);
 };
 
-// ── POST /api/v2/whatsapp/webhook (Meta Status Callbacks) ────
+// ── POST /api/v2/whatsapp/webhook (Meta Status & Inbound Messages) ──
 exports.handleWebhook = (req, res) => {
   try {
     const body = req.body;
     if (body.object === 'whatsapp_business_account') {
+      // Find the active shop or default to first shop
+      const allShops = shopRepo.getAllShops();
+      const defaultShopId = allShops[0]?.id || 'shop_461194823752748';
+
       (body.entry || []).forEach(entry => {
         (entry.changes || []).forEach(change => {
           const value = change.value;
+          const wabaId = entry.id;
+
+          // Find shop matching this WABA if multi-shop
+          const matchingShop = allShops.find(s => s.whatsapp?.wabaId === wabaId) || allShops[0];
+          const activeShopId = matchingShop?.id || defaultShopId;
+
+          // 1. Inbound Customer Messages
+          if (value?.messages) {
+            const contacts = value.contacts || [];
+            value.messages.forEach(msg => {
+              const from = msg.from; // Customer phone (e.g. 917982296878)
+              const wamid = msg.id;
+              const timestamp = msg.timestamp;
+              const text = msg.text?.body || msg.button?.text || msg.interactive?.button_reply?.title || (msg.type ? `[${msg.type} message]` : '');
+              
+              // Resolve sender name from Meta contact profile or customer ledger
+              const contactProfile = contacts.find(c => c.wa_id === from);
+              const senderName = contactProfile?.profile?.name || null;
+
+              console.log(`[whatsapp:webhook] Inbound message from ${from} (${senderName || 'Customer'}): "${text}"`);
+              chatRepo.saveInboundMessage(activeShopId, {
+                from,
+                text,
+                wamid,
+                timestamp,
+                senderName,
+              });
+            });
+          }
+
+          // 2. Delivery & Read Status Callbacks
           if (value?.statuses) {
             value.statuses.forEach(st => {
               const wamid = st.id;
@@ -554,6 +590,7 @@ exports.handleWebhook = (req, res) => {
               const errorMsg = st.errors && st.errors.length > 0 ? (st.errors[0].title || st.errors[0].message || `Error code ${st.errors[0].code}`) : null;
               console.log(`[whatsapp:webhook] Status update: ${wamid} -> ${status}${errorMsg ? ` (${errorMsg})` : ''}`);
               historyRepo.updateMessageStatus(wamid, status, timestamp, errorMsg);
+              chatRepo.updateChatMessageStatus(wamid, status);
             });
           }
         });
@@ -563,5 +600,137 @@ exports.handleWebhook = (req, res) => {
   } catch (err) {
     console.error('[whatsapp:webhook] Error processing webhook:', err.message);
     res.sendStatus(200); // Always 200 OK for Meta
+  }
+};
+
+// ── GET /api/v2/whatsapp/chats (List All Conversations) ───────
+exports.getConversations = (req, res) => {
+  try {
+    const shopId = getShopId(req);
+    if (!shopId) return res.status(400).json({ success: false, error: 'Shop ID is required.', code: 'MISSING_SHOP_ID' });
+
+    const { search } = req.query;
+    const conversations = chatRepo.getConversationsForShop(shopId, { search });
+    res.json({ success: true, data: conversations });
+  } catch (err) {
+    const f = formatError(err);
+    res.status(500).json({ success: false, error: f.message, code: f.code });
+  }
+};
+
+// ── GET /api/v2/whatsapp/chats/:phone (Get Full Thread) ───────
+exports.getThreadMessages = (req, res) => {
+  try {
+    const shopId = getShopId(req);
+    const phone = req.params.phone;
+    if (!shopId) return res.status(400).json({ success: false, error: 'Shop ID is required.', code: 'MISSING_SHOP_ID' });
+    if (!phone) return res.status(400).json({ success: false, error: 'Phone is required.', code: 'MISSING_PHONE' });
+
+    const thread = chatRepo.getThread(shopId, phone);
+    res.json({ success: true, data: thread });
+  } catch (err) {
+    const f = formatError(err);
+    res.status(500).json({ success: false, error: f.message, code: f.code });
+  }
+};
+
+// ── POST /api/v2/whatsapp/chats/send (Send 2-Way Reply) ────────
+exports.sendReply = async (req, res) => {
+  try {
+    const shopId = getShopId(req);
+    const { customerPhone, text, templateId, extraVars = {}, customerName } = req.body;
+
+    if (!shopId) return res.status(400).json({ success: false, error: 'Shop ID is required.', code: 'MISSING_SHOP_ID' });
+    if (!customerPhone) return res.status(400).json({ success: false, error: 'Customer phone number is required.', code: 'MISSING_PHONE' });
+    if (!text && !templateId) return res.status(400).json({ success: false, error: 'Message text or template ID is required.', code: 'MISSING_MESSAGE' });
+
+    let result;
+    let templateName = null;
+    let renderedText = text || '';
+
+    if (templateId) {
+      // Send via official template
+      const template = await whatsappService.getTemplate(templateId, shopId);
+      templateName = template.name;
+      renderedText = whatsappService.renderTemplate(template, {
+        customerName: customerName || 'Customer',
+        ...extraVars,
+      });
+
+      const templateConfig = {
+        templateName: template.metaName || template.id.replace(/^meta_/, ''),
+        languageCode: template.language || 'en',
+        parameters: Object.values(extraVars),
+        wabaId: template.wabaId,
+      };
+
+      result = await whatsappService.sendViaCloudAPI(customerPhone, renderedText, templateConfig, shopId);
+    } else {
+      // Freeform reply (for open 24-hour customer service window)
+      result = await whatsappService.sendViaCloudAPI(customerPhone, text, null, shopId);
+    }
+
+    const wamid = result?.messages?.[0]?.id || null;
+
+    // Save to 2-way chat repository
+    const chatEntry = chatRepo.saveOutboundMessage(shopId, {
+      to: customerPhone,
+      text: renderedText,
+      wamid,
+      templateName,
+      status: 'sent',
+      customerName,
+    });
+
+    // Record in history log
+    historyRepo.recordMessage(shopId, {
+      wamid,
+      recipientName: customerName || 'Customer',
+      recipientPhone: customerPhone,
+      templateId: templateId || null,
+      templateName: templateName || 'Live Chat Reply',
+      renderedBody: renderedText,
+      deliveryMode: 'cloud',
+      status: 'sent',
+    });
+
+    res.json({
+      success: true,
+      data: chatEntry.message,
+      thread: chatEntry.thread,
+      message: 'Reply dispatched successfully via WhatsApp Cloud API.',
+    });
+  } catch (err) {
+    const f = formatError(err);
+    res.status(500).json({ success: false, error: f.message, code: f.code });
+  }
+};
+
+// ── POST /api/v2/whatsapp/chats/:phone/read (Mark Read) ──────
+exports.markChatRead = (req, res) => {
+  try {
+    const shopId = getShopId(req);
+    const phone = req.params.phone;
+    if (!shopId) return res.status(400).json({ success: false, error: 'Shop ID is required.', code: 'MISSING_SHOP_ID' });
+
+    const updated = chatRepo.markAsRead(shopId, phone);
+    res.json({ success: true, data: updated });
+  } catch (err) {
+    const f = formatError(err);
+    res.status(500).json({ success: false, error: f.message, code: f.code });
+  }
+};
+
+// ── GET /api/v2/whatsapp/chats/unread-count ───────────────────
+exports.getUnreadCount = (req, res) => {
+  try {
+    const shopId = getShopId(req);
+    if (!shopId) return res.status(400).json({ success: false, error: 'Shop ID is required.', code: 'MISSING_SHOP_ID' });
+
+    const count = chatRepo.getUnreadCountForShop(shopId);
+    res.json({ success: true, data: { unreadCount: count } });
+  } catch (err) {
+    const f = formatError(err);
+    res.status(500).json({ success: false, error: f.message, code: f.code });
   }
 };

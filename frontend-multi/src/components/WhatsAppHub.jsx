@@ -5,8 +5,10 @@ import {
   updateCustomer, deleteCustomer, generateWALink,
   generateBulkLinks, sendViaCloud,
   getWhatsAppStatus, getAvailableWhatsAppNumbers, connectWhatsAppOAuth, disconnectWhatsApp,
+  getChatUnreadCount,
 } from '../api/whatsapp';
 import WhatsAppHistory from './WhatsAppHistory';
+import WhatsAppMessenger from './WhatsAppMessenger';
 import './WhatsAppHub.css';
 
 const DELIVERY_MODE_KEY = 'wa_delivery_mode';
@@ -49,7 +51,8 @@ export default function WhatsAppHub({ shop }) {
   const shopName = shop?.shopName || shop?.facebook?.pageName || 'Shop';
 
   // ── State ────────────────────────────────────────────────────
-  const [activeTab, setActiveTab] = useState('composer'); // 'composer' | 'history'
+  const [activeTab, setActiveTab] = useState('composer'); // 'composer' | 'history' | 'messenger'
+  const [unreadChatCount, setUnreadChatCount] = useState(0);
   const [lastSentTime, setLastSentTime] = useState(null);
   const [templates, setTemplates] = useState([]);
   const [customers, setCustomers] = useState([]);
@@ -110,6 +113,10 @@ export default function WhatsAppHub({ shop }) {
     getAvailableWhatsAppNumbers(shopId)
       .then(setAvailableNumbers)
       .catch(() => setAvailableNumbers([]));
+
+    getChatUnreadCount(shopId)
+      .then(data => setUnreadChatCount(data?.unreadCount || 0))
+      .catch(() => setUnreadChatCount(0));
   }, [shopId]);
 
   useEffect(() => {
@@ -567,9 +574,18 @@ export default function WhatsAppHub({ shop }) {
         >
           📜 Message History & Live Status
         </button>
+        <button
+          type="button"
+          className={`wa-main-nav-btn ${activeTab === 'messenger' ? 'wa-main-nav-btn--active' : ''}`}
+          onClick={() => setActiveTab('messenger')}
+        >
+          💬 Live Chat & Messenger {unreadChatCount > 0 && <span className="wa-unread-bubble">{unreadChatCount}</span>}
+        </button>
       </div>
 
-      {activeTab === 'history' ? (
+      {activeTab === 'messenger' ? (
+        <WhatsAppMessenger shopId={shopId} shopName={shopName} activePhone={waStatus} />
+      ) : activeTab === 'history' ? (
         <WhatsAppHistory shopId={shopId} shopName={shopName} lastSentTime={lastSentTime} />
       ) : (
         <div className="wa-hub-body">

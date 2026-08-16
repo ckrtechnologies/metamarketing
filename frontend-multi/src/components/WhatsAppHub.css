@@ -1227,4 +1227,21 @@
   padding: 0 16px;
 }
 
+/* ── Live Messenger Nav Tab Badge ────────────────────────────── */
+.wa-unread-bubble {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #25D366;
+  color: #06110b;
+  font-size: 10px;
+  font-weight: 800;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 10px;
+  margin-left: 6px;
+}
+
+
 

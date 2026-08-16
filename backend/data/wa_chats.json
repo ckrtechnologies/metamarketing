@@ -1,0 +1,36 @@
+{
+  "conversations": {
+    "shop_461194823752748_7982296878": {
+      "id": "shop_461194823752748_7982296878",
+      "shopId": "shop_461194823752748",
+      "customerPhone": "7982296878",
+      "customerName": "Chandan Mallik",
+      "unreadCount": 1,
+      "lastMessage": "Hi Chandan! Yes, we would be delighted to assist you. Your current invoice balance is cleared and your appointment is confirmed for tomorrow 11 AM.",
+      "lastMessageAt": "2026-08-16T11:34:49.980Z",
+      "lastInboundAt": "2026-08-16T11:34:45.000Z",
+      "messages": [
+        {
+          "id": "msg_in_1786880085736_5dmi",
+          "wamid": "wamid.inbound_test_1786880085722",
+          "direction": "inbound",
+          "text": "Hello! Can you help me with my appointment and billing?",
+          "media": null,
+          "status": "delivered",
+          "timestamp": "2026-08-16T11:34:45.000Z"
+        },
+        {
+          "id": "msg_out_1786880089980_se6n",
+          "wamid": "wamid.HBgMOTE3OTgyMjk2ODc4FQIAERgSMjVGMEFCMDIyMzNFRjRGREQ2AA==",
+          "direction": "outbound",
+          "text": "Hi Chandan! Yes, we would be delighted to assist you. Your current invoice balance is cleared and your appointment is confirmed for tomorrow 11 AM.",
+          "templateName": null,
+          "status": "sent",
+          "timestamp": "2026-08-16T11:34:49.980Z"
+        }
+      ],
+      "createdAt": "2026-08-16T11:34:45.000Z",
+      "updatedAt": "2026-08-16T11:34:49.980Z"
+    }
+  }
+}

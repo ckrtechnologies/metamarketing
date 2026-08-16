@@ -32,7 +32,14 @@ router.post('/send-cloud', whatsappController.sendViaCloud);
 router.get('/history', whatsappController.getMessageHistory);
 router.get('/history/stats', whatsappController.getHistoryStats);
 
-// ── Webhook: Meta Live Status Callbacks (delivered / read) ─────
+// ── 2-Way Live Chat & Customer Messenger ─────────────────────
+router.get('/chats', whatsappController.getConversations);
+router.get('/chats/unread-count', whatsappController.getUnreadCount);
+router.get('/chats/:phone', whatsappController.getThreadMessages);
+router.post('/chats/send', whatsappController.sendReply);
+router.post('/chats/:phone/read', whatsappController.markChatRead);
+
+// ── Webhook: Meta Inbound Messages & Live Status Callbacks ────
 router.get('/webhook', whatsappController.verifyWebhook);
 router.post('/webhook', whatsappController.handleWebhook);
 

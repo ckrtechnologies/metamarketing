@@ -86,3 +86,31 @@ export const getHistoryStats = (shopId) =>
   api.get('/v2/whatsapp/history/stats', {
     headers: { 'x-shop-id': shopId },
   }).then(r => r.data.data);
+
+// ── 2-Way Live Chat & Customer Messenger ─────────────────────
+export const getConversations = (shopId, params = {}) =>
+  api.get('/v2/whatsapp/chats', {
+    headers: { 'x-shop-id': shopId },
+    params,
+  }).then(r => r.data.data);
+
+export const getChatMessages = (shopId, phone) =>
+  api.get(`/v2/whatsapp/chats/${phone}`, {
+    headers: { 'x-shop-id': shopId },
+  }).then(r => r.data.data);
+
+export const sendChatReply = (shopId, data) =>
+  api.post('/v2/whatsapp/chats/send', data, {
+    headers: { 'x-shop-id': shopId },
+  }).then(r => r.data);
+
+export const markChatRead = (shopId, phone) =>
+  api.post(`/v2/whatsapp/chats/${phone}/read`, {}, {
+    headers: { 'x-shop-id': shopId },
+  }).then(r => r.data.data);
+
+export const getChatUnreadCount = (shopId) =>
+  api.get('/v2/whatsapp/chats/unread-count', {
+    headers: { 'x-shop-id': shopId },
+  }).then(r => r.data.data);
+
