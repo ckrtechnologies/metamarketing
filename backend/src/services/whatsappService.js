@@ -120,10 +120,37 @@ async function getAllTemplates() {
   const local = getLocalTemplates();
   const metaCloud = await getMetaCloudTemplates();
 
-  // Combine local and Meta Cloud templates (avoid duplicate names)
-  const combined = [...local];
+  // Clean name helper e.g. "📢 templet2" -> "templet2"
+  const cleanName = (str) => String(str || '').replace(/^[\uD800-\uDBFF\uDC00-\uDFFF\u2600-\u27BF\s]+/, '').trim().toLowerCase().replace(/[^a-z0-9_]/g, '_');
+
+  const combined = [];
+
+  // Add local templates, upgrading them if they exist in Meta Cloud
+  local.forEach(loc => {
+    const locClean = cleanName(loc.name);
+    const matchingMeta = metaCloud.find(mt => cleanName(mt.metaName || mt.name) === locClean);
+
+    if (matchingMeta) {
+      // Upgrade local template with Meta official credentials & params
+      combined.push({
+        ...loc,
+        ...matchingMeta,
+        id: loc.id,
+        name: `☁️ ${locClean}`,
+        isMetaOfficial: true,
+        metaName: matchingMeta.metaName,
+        paramCount: matchingMeta.paramCount,
+        language: matchingMeta.language,
+      });
+    } else {
+      combined.push(loc);
+    }
+  });
+
+  // Add remaining Meta Cloud templates not already merged
   metaCloud.forEach(mt => {
-    if (!combined.some(c => c.id === mt.id || c.metaName === mt.metaName)) {
+    const mtClean = cleanName(mt.metaName || mt.name);
+    if (!combined.some(c => cleanName(c.metaName || c.name) === mtClean)) {
       combined.push(mt);
     }
   });
