@@ -120,7 +120,7 @@ exports.deleteCustomer = (req, res) => {
 
 // ── POST /api/v2/whatsapp/send-link ──────────────────────────
 // Mode A: Returns a pre-built wa.me link (free, no API required)
-exports.generateWALink = (req, res) => {
+exports.generateWALink = async (req, res) => {
   try {
     const shopId = getShopId(req);
     const { templateId, customerId, extraVars = {}, shopName } = req.body;
@@ -133,7 +133,7 @@ exports.generateWALink = (req, res) => {
     const customer = customers.find(c => c.id === customerId);
     if (!customer) return res.status(404).json({ success: false, error: 'Customer not found in this shop ledger.', code: 'CUSTOMER_NOT_FOUND' });
 
-    const template = whatsappService.getTemplate(templateId);
+    const template = await whatsappService.getTemplate(templateId);
     const result = whatsappService.generateSingleWALink(customer, template, { shopName, ...extraVars });
 
     // Record that reminder was sent
@@ -150,7 +150,7 @@ exports.generateWALink = (req, res) => {
 
 // ── POST /api/v2/whatsapp/bulk-links ─────────────────────────
 // Mode A Bulk: Returns array of wa.me links for multiple customers
-exports.generateBulkLinks = (req, res) => {
+exports.generateBulkLinks = async (req, res) => {
   try {
     const shopId = getShopId(req);
     const { templateId, customerIds, extraVars = {}, shopName } = req.body;
@@ -167,7 +167,7 @@ exports.generateBulkLinks = (req, res) => {
       return res.status(404).json({ success: false, error: 'None of the specified customers were found for this shop.', code: 'CUSTOMERS_NOT_FOUND' });
     }
 
-    const template = whatsappService.getTemplate(templateId);
+    const template = await whatsappService.getTemplate(templateId);
     const results = whatsappService.generateBulkWALinks(selected, template, { shopName, ...extraVars });
 
     // Record reminder sent for all
@@ -196,7 +196,7 @@ exports.sendViaCloud = async (req, res) => {
     const customer = customers.find(c => c.id === customerId);
     if (!customer) return res.status(404).json({ success: false, error: 'Customer not found.', code: 'CUSTOMER_NOT_FOUND' });
 
-    const template = whatsappService.getTemplate(templateId);
+    const template = await whatsappService.getTemplate(templateId);
     const renderedBody = whatsappService.renderTemplate(template, {
       customerName: customer.name,
       shopName,

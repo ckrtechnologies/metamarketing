@@ -20,9 +20,9 @@
       "balanceDue": 1000,
       "notes": "test notes",
       "tags": [],
-      "lastReminder": "2026-08-16T08:31:40.878Z",
+      "lastReminder": "2026-08-16T08:36:41.821Z",
       "createdAt": "2026-08-16T07:10:20.401Z",
-      "updatedAt": "2026-08-16T08:31:40.878Z"
+      "updatedAt": "2026-08-16T08:36:41.821Z"
     },
     {
       "id": "cust_63da267d15b440b8",
@@ -32,9 +32,9 @@
       "balanceDue": 0,
       "notes": "",
       "tags": [],
-      "lastReminder": "2026-08-16T08:27:47.802Z",
+      "lastReminder": "2026-08-16T08:36:43.171Z",
       "createdAt": "2026-08-16T08:27:28.598Z",
-      "updatedAt": "2026-08-16T08:27:47.802Z"
+      "updatedAt": "2026-08-16T08:36:43.171Z"
     }
   ]
 }
