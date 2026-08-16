@@ -67,6 +67,7 @@ async function getLiveShopProfile(shopId) {
   });
 
   return {
+    id: shop.id,
     shopId: shop.id,
     shopName: shop.shopName,
     ownerName: shop.ownerName,

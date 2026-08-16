@@ -7,16 +7,27 @@ export default function ShopFeeds({ shop, refreshTrigger }) {
   const [feeds, setFeeds] = useState({ facebookPosts: [], instagramMedia: [] });
   const [loading, setLoading] = useState(true);
 
-  const load = useCallback(() => {
-    if (!shop?.id) return;
-    setLoading(true);
-    getShopFeeds(shop.id)
-      .then(setFeeds)
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [shop?.id]);
+  const shopId = shop?.id || shop?.shopId;
 
-  useEffect(load, [load, refreshTrigger]);
+  const load = useCallback(() => {
+    if (!shopId) return;
+    setLoading(true);
+    getShopFeeds(shopId)
+      .then(data => {
+        setFeeds({
+          facebookPosts: data?.facebookPosts || [],
+          instagramMedia: data?.instagramMedia || [],
+        });
+      })
+      .catch(err => {
+        console.error('Error fetching shop feeds:', err);
+      })
+      .finally(() => setLoading(false));
+  }, [shopId]);
+
+  useEffect(() => {
+    load();
+  }, [load, refreshTrigger]);
 
   return (
     <section className="shop-feeds">
