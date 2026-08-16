@@ -216,16 +216,71 @@
   color: var(--text-muted);
 }
 
-.feeds-skeleton {
+/* ── Error Card & Retry ──────────────────────────────────────── */
+.feeds-error-card {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   gap: 12px;
+  padding: 40px 24px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-md);
+  margin: 10px 0;
 }
 
-.feed-skeleton-card {
-  height: 120px;
-  border-radius: var(--radius-md);
-  background: linear-gradient(90deg, var(--bg-surface-2) 25%, rgba(255,255,255,0.05) 50%, var(--bg-surface-2) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s infinite;
+.feeds-error-icon {
+  font-size: 36px;
 }
+
+.feeds-error-title {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 700;
+  color: #fca5a5;
+}
+
+.feeds-error-message {
+  font-size: 13px;
+  color: var(--text-secondary);
+  max-width: 420px;
+  line-height: 1.5;
+}
+
+.feeds-retry-btn {
+  padding: 10px 20px;
+  background: var(--bg-surface-2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.feeds-retry-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  transform: translateY(-2px);
+}
+
+.skeleton-loading-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+  padding-bottom: 6px;
+}
+
+.spinner-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1877f2;
+  animation: pulse 1.2s infinite;
+}
+

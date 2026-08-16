@@ -6,12 +6,15 @@ export default function ShopFeeds({ shop, refreshTrigger }) {
   const [activeTab, setActiveTab] = useState('fb');
   const [feeds, setFeeds] = useState({ facebookPosts: [], instagramMedia: [] });
   const [loading, setLoading] = useState(true);
+  const [feedError, setFeedError] = useState(null);
 
   const shopId = shop?.id || shop?.shopId;
 
   const load = useCallback(() => {
     if (!shopId) return;
     setLoading(true);
+    setFeedError(null);
+
     getShopFeeds(shopId)
       .then(data => {
         setFeeds({
@@ -20,7 +23,14 @@ export default function ShopFeeds({ shop, refreshTrigger }) {
         });
       })
       .catch(err => {
+        const errorMsg =
+          err.response?.data?.error ||
+          err.response?.data?.message ||
+          (err.code === 'ERR_NETWORK'
+            ? 'Backend server is not responding. Please check if http://localhost:5001 is running.'
+            : err.message || 'Failed to fetch shop feeds from Meta.');
         console.error('Error fetching shop feeds:', err);
+        setFeedError(errorMsg);
       })
       .finally(() => setLoading(false));
   }, [shopId]);
@@ -55,6 +65,7 @@ export default function ShopFeeds({ shop, refreshTrigger }) {
           className={`shop-feed-refresh ${loading ? 'shop-feed-refresh--spin' : ''}`}
           onClick={load}
           title="Refresh feeds"
+          disabled={loading}
         >
           🔄
         </button>
@@ -62,9 +73,24 @@ export default function ShopFeeds({ shop, refreshTrigger }) {
 
       {loading ? (
         <div className="feeds-skeleton">
-          {[...Array(4)].map((_, i) => (
+          <div className="skeleton-loading-text">
+            <span className="spinner-dot" /> Loading live feeds from Meta…
+          </div>
+          {[...Array(3)].map((_, i) => (
             <div key={i} className="feed-skeleton-card" />
           ))}
+        </div>
+      ) : feedError ? (
+        /* Error State with actionable retry */
+        <div className="feeds-error-card">
+          <div className="feeds-error-icon">⚠️</div>
+          <h3 className="feeds-error-title">Unable to Load Feeds</h3>
+          <p className="feeds-error-message">{feedError}</p>
+          <div className="feeds-error-actions">
+            <button type="button" className="feeds-retry-btn" onClick={load}>
+              🔄 Try Again
+            </button>
+          </div>
         </div>
       ) : activeTab === 'fb' ? (
         /* Facebook Timeline */
@@ -72,7 +98,8 @@ export default function ShopFeeds({ shop, refreshTrigger }) {
           {feeds.facebookPosts.length === 0 ? (
             <div className="feeds-empty">
               <span>📘</span>
-              <p>No Facebook posts published yet.</p>
+              <p>No Facebook posts published yet for this page.</p>
+              <span className="feeds-empty-sub">Use the composer on the left to publish your first post!</span>
             </div>
           ) : (
             feeds.facebookPosts.map(post => (
