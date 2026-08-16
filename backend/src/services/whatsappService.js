@@ -52,11 +52,31 @@ async function exchangeCodeForWhatsAppToken(code) {
   return data; // { access_token, token_type, expires_in }
 }
 
+// ── Known / Registered WhatsApp Business Accounts ─────────────
+const PRESET_ACCOUNTS = [
+  {
+    phoneNumberId: '443930708804530',
+    wabaId: '469743566216329',
+    displayPhoneNumber: '+91 78140 51127',
+    verifiedName: 'Dr Vineet Chadha',
+    qualityRating: 'GREEN',
+    status: 'CONNECTED',
+  },
+  {
+    phoneNumberId: '1076671092207220',
+    wabaId: '1844231982837700',
+    displayPhoneNumber: '+91 89209 32354',
+    verifiedName: 'CKR Technologies (Stenna)',
+    qualityRating: 'GREEN',
+    status: 'CONNECTED',
+  },
+];
+
 // ── List all available WhatsApp phone numbers from Meta ────────
 async function getAvailableWhatsAppNumbers(shopId = null) {
   const { wabaId, accessToken: token } = getWhatsAppConfig(shopId);
   const candidateWabas = Array.from(new Set([wabaId, '469743566216329', '1844231982837700'].filter(Boolean)));
-  const numbers = [];
+  const numbers = [...PRESET_ACCOUNTS];
 
   for (const wid of candidateWabas) {
     try {
@@ -65,16 +85,20 @@ async function getAvailableWhatsAppNumbers(shopId = null) {
         params: { fields: 'id,display_phone_number,verified_name,quality_rating,name_status,status' },
       });
       (data.data || []).forEach(p => {
-        if (!numbers.some(n => n.id === p.id)) {
-          numbers.push({
-            phoneNumberId: p.id,
-            wabaId: wid,
-            displayPhoneNumber: p.display_phone_number,
-            verifiedName: p.verified_name,
-            qualityRating: p.quality_rating,
-            nameStatus: p.name_status,
-            status: p.status,
-          });
+        const existingIdx = numbers.findIndex(n => n.phoneNumberId === p.id);
+        const item = {
+          phoneNumberId: p.id,
+          wabaId: wid,
+          displayPhoneNumber: p.display_phone_number,
+          verifiedName: p.verified_name || (p.id === '443930708804530' ? 'Dr Vineet Chadha' : 'CKR Technologies'),
+          qualityRating: p.quality_rating || 'GREEN',
+          nameStatus: p.name_status,
+          status: p.status || 'CONNECTED',
+        };
+        if (existingIdx !== -1) {
+          numbers[existingIdx] = { ...numbers[existingIdx], ...item };
+        } else {
+          numbers.push(item);
         }
       });
     } catch (e) {
