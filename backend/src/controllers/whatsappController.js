@@ -226,6 +226,29 @@ exports.getCustomers = (req, res) => {
   }
 };
 
+// ── Helper: Validate customer phone format ───────────────────
+function validateCustomerPhone(phone) {
+  const digits = String(phone || '').replace(/\D/g, '');
+  if (!digits) throw new Error('Phone number is required.');
+  if (digits.length === 10) {
+    if (!/^[6-9]\d{9}$/.test(digits)) {
+      throw new Error(`Invalid mobile number "${phone}". Indian 10-digit numbers must start with 6, 7, 8, or 9.`);
+    }
+    return digits;
+  }
+  if (digits.length === 12 && digits.startsWith('91')) {
+    const local10 = digits.slice(2);
+    if (!/^[6-9]\d{9}$/.test(local10)) {
+      throw new Error(`Invalid mobile number "${phone}". Local 10 digits must start with 6, 7, 8, or 9.`);
+    }
+    return local10;
+  }
+  if (digits.length >= 10 && digits.length <= 15) {
+    return digits;
+  }
+  throw new Error(`Invalid phone number "${phone}". Please enter a valid 10-digit mobile number.`);
+}
+
 // ── POST /api/v2/whatsapp/customers ───────────────────────────
 exports.addCustomer = (req, res) => {
   try {
@@ -236,11 +259,12 @@ exports.addCustomer = (req, res) => {
     if (!name || !name.trim()) return res.status(400).json({ success: false, error: 'Customer name is required.', code: 'MISSING_NAME' });
     if (!phone) return res.status(400).json({ success: false, error: 'Customer phone number is required.', code: 'MISSING_PHONE' });
 
-    const customer = customerRepo.addCustomer(shopId, { name: name.trim(), phone, balanceDue, notes, tags });
+    const cleanPhone = validateCustomerPhone(phone);
+    const customer = customerRepo.addCustomer(shopId, { name: name.trim(), phone: cleanPhone, balanceDue, notes, tags });
     res.status(201).json({ success: true, data: customer, message: 'Customer added to ledger.' });
   } catch (err) {
     const f = formatError(err);
-    res.status(500).json({ success: false, error: f.message, code: f.code });
+    res.status(400).json({ success: false, error: f.message, code: f.code });
   }
 };
 
@@ -251,11 +275,16 @@ exports.updateCustomer = (req, res) => {
     const customerId = req.params.id;
     if (!shopId) return res.status(400).json({ success: false, error: 'Shop ID is required.', code: 'MISSING_SHOP_ID' });
 
-    const updated = customerRepo.updateCustomer(shopId, customerId, req.body);
+    const data = { ...req.body };
+    if (data.phone) {
+      data.phone = validateCustomerPhone(data.phone);
+    }
+
+    const updated = customerRepo.updateCustomer(shopId, customerId, data);
     res.json({ success: true, data: updated, message: 'Customer updated.' });
   } catch (err) {
     const f = formatError(err);
-    const status = f.message.includes('not found') ? 404 : 500;
+    const status = f.message.includes('not found') ? 404 : 400;
     res.status(status).json({ success: false, error: f.message, code: f.code });
   }
 };

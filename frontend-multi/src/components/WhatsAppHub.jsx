@@ -319,6 +319,25 @@ export default function WhatsAppHub({ shop }) {
     }
   }
 
+  // ── Sync Templates from Meta ──────────────────────────────────
+  async function handleSyncTemplates() {
+    setLoading(l => ({ ...l, syncingTpls: true }));
+    setError(null);
+    try {
+      const res = await getTemplates(shopId);
+      const list = res.data || [];
+      setTemplates(list);
+      if (!selectedTemplate && list.length > 0) {
+        setSelectedTemplate(list[0]);
+      }
+      showSuccess(`🎉 Synced ${list.length} template${list.length === 1 ? '' : 's'} live with Meta WhatsApp Cloud!`);
+    } catch (err) {
+      setError(err.response?.data?.error || err.message);
+    } finally {
+      setLoading(l => ({ ...l, syncingTpls: false }));
+    }
+  }
+
   // ── Delete Template ───────────────────────────────────────────
   async function handleDeleteTemplate(tpl, e) {
     e.stopPropagation();
@@ -756,25 +775,46 @@ export default function WhatsAppHub({ shop }) {
           <div className="wa-templates-section">
             <div className="wa-templates-header">
               <div className="wa-section-label">SELECT TEMPLATE</div>
-              <button
-                type="button"
-                className="wa-create-tpl-btn"
-                onClick={() => setShowCreateTplModal(true)}
-              >
-                ➕ Create Template
-              </button>
-            </div>
-
-            {templates.length === 0 ? (
-              <div className="wa-templates-empty">
-                <p>No templates registered yet on Meta WhatsApp Cloud API.</p>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <button
+                  type="button"
+                  className="wa-sync-tpl-btn"
+                  onClick={handleSyncTemplates}
+                  disabled={loading.syncingTpls}
+                  title="Fetch latest approved templates directly from Meta"
+                >
+                  {loading.syncingTpls ? '⏳ Syncing…' : '🔄 Sync from Meta'}
+                </button>
                 <button
                   type="button"
                   className="wa-create-tpl-btn"
                   onClick={() => setShowCreateTplModal(true)}
                 >
-                  ➕ Create First Template
+                  ➕ Create Template
                 </button>
+              </div>
+            </div>
+
+            {templates.length === 0 ? (
+              <div className="wa-templates-empty">
+                <p>No templates registered yet on Meta WhatsApp Cloud API.</p>
+                <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
+                  <button
+                    type="button"
+                    className="wa-sync-tpl-btn"
+                    onClick={handleSyncTemplates}
+                    disabled={loading.syncingTpls}
+                  >
+                    {loading.syncingTpls ? '⏳ Syncing…' : '🔄 Sync from Meta'}
+                  </button>
+                  <button
+                    type="button"
+                    className="wa-create-tpl-btn"
+                    onClick={() => setShowCreateTplModal(true)}
+                  >
+                    ➕ Create First Template
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="wa-templates-grid">

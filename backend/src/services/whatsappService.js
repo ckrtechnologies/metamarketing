@@ -362,6 +362,33 @@ function buildWAMeLink(phone, messageBody) {
 
 // ── Mode B: Meta WhatsApp Cloud API ──────────────────────────
 // Sends an official WhatsApp Template Message (delivered cold 24/7 without customer messaging first)
+// ── Helper: Strict Phone Number Validation ────────────────────
+function validateAndNormalizePhone(phone) {
+  const digits = String(phone || '').replace(/\D/g, '');
+  if (!digits) {
+    throw new Error('Phone number is required.');
+  }
+  if (digits.length === 10) {
+    if (!/^[6-9]\d{9}$/.test(digits)) {
+      throw new Error(`Invalid Indian mobile number "${phone}". Mobile numbers must start with 6, 7, 8, or 9.`);
+    }
+    return '91' + digits;
+  }
+  if (digits.length === 12 && digits.startsWith('91')) {
+    const local10 = digits.slice(2);
+    if (!/^[6-9]\d{9}$/.test(local10)) {
+      throw new Error(`Invalid Indian mobile number "${phone}". Local 10 digits must start with 6, 7, 8, or 9.`);
+    }
+    return digits;
+  }
+  if (digits.length >= 11 && digits.length <= 15) {
+    return digits;
+  }
+  throw new Error(`Invalid phone number "${phone}". Must be a valid 10-digit mobile number.`);
+}
+
+// ── Send a WhatsApp message via Meta Cloud API ────────────────
+// Accepts either an official Meta template (templateConfig)
 // or free-form text if templateName is not provided.
 async function sendViaCloudAPI(phone, messageBody, templateConfig = null, shopId = null) {
   const { phoneNumberId, accessToken } = getWhatsAppConfig(shopId);
@@ -372,15 +399,14 @@ async function sendViaCloudAPI(phone, messageBody, templateConfig = null, shopId
     );
   }
 
+  const normalizedPhone = validateAndNormalizePhone(phone);
+
   let activePhoneId = phoneNumberId;
   if (templateConfig?.wabaId === '1844231982837700') {
     activePhoneId = '1076671092207220';
   } else if (templateConfig?.wabaId === '469743566216329') {
     activePhoneId = '443930708804530';
   }
-
-  let normalizedPhone = String(phone).replace(/\D/g, '');
-  if (normalizedPhone.length === 10) normalizedPhone = '91' + normalizedPhone;
 
   const url = `https://graph.facebook.com/v19.0/${activePhoneId}/messages`;
 

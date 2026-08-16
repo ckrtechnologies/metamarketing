@@ -874,6 +874,33 @@
   transform: translateY(-1px);
 }
 
+.wa-sync-tpl-btn {
+  padding: 5px 12px;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 8px;
+  color: #818cf8;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.wa-sync-tpl-btn:hover:not(:disabled) {
+  background: rgba(99, 102, 241, 0.25);
+  color: #a5b4fc;
+  border-color: rgba(99, 102, 241, 0.6);
+  transform: translateY(-1px);
+}
+
+.wa-sync-tpl-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .wa-template-card-top {
   display: flex;
   align-items: center;
