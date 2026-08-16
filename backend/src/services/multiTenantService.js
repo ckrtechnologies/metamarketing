@@ -299,6 +299,17 @@ async function waitForContainer(containerId, token, maxAttempts = 25) {
   return true;
 }
 
+// ── Delete Facebook Post ──────────────────────────────────────
+async function deleteFacebookPost(shopId, postId) {
+  const shop = getShopOrThrow(shopId);
+  const token = shop.facebook.pageAccessToken;
+
+  const { data } = await axios.delete(graphUrl(`/${postId}`), {
+    params: { access_token: token },
+  });
+  return data;
+}
+
 module.exports = {
   getLiveShopProfile,
   getShopFeeds,
@@ -306,4 +317,5 @@ module.exports = {
   publishLinkPost,
   publishPhotoPost,
   publishReelPost,
+  deleteFacebookPost,
 };

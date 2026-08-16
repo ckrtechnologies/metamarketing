@@ -34,5 +34,6 @@ router.post('/posts/text', multiTenantController.postText);
 router.post('/posts/link', multiTenantController.postLink);
 router.post('/posts/photo', imageUpload.single('image'), multiTenantController.postPhoto);
 router.post('/posts/reel', videoUpload.single('video'), multiTenantController.postReel);
+router.delete('/posts/:postId', multiTenantController.deletePost);
 
 module.exports = router;

@@ -51,3 +51,6 @@ export const publishReelPost = (message, videoFile, options = {}) => {
     headers: { 'Content-Type': 'multipart/form-data' },
   }).then(r => r.data);
 };
+
+export const deleteFacebookPost = (postId) =>
+  api.delete(`/v2/posts/${postId}`).then(r => r.data);

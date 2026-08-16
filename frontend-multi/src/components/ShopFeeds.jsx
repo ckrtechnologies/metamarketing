@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getShopFeeds } from '../api/auth';
+import { getShopFeeds, deleteFacebookPost } from '../api/auth';
 import './ShopFeeds.css';
 
 export default function ShopFeeds({ shop, refreshTrigger }) {
@@ -7,6 +7,8 @@ export default function ShopFeeds({ shop, refreshTrigger }) {
   const [feeds, setFeeds] = useState({ facebookPosts: [], instagramMedia: [] });
   const [loading, setLoading] = useState(true);
   const [feedError, setFeedError] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+  const [openCommentsId, setOpenCommentsId] = useState(null);
 
   const shopId = shop?.id || shop?.shopId;
 
@@ -38,6 +40,30 @@ export default function ShopFeeds({ shop, refreshTrigger }) {
   useEffect(() => {
     load();
   }, [load, refreshTrigger]);
+
+  async function handleDeletePost(postId) {
+    if (!window.confirm(`Are you sure you want to permanently delete this post from ${shop?.shopName}'s Facebook Page?`)) {
+      return;
+    }
+
+    setDeletingId(postId);
+    try {
+      await deleteFacebookPost(postId);
+      setFeeds(prev => ({
+        ...prev,
+        facebookPosts: prev.facebookPosts.filter(p => p.id !== postId),
+      }));
+    } catch (err) {
+      console.error('Delete post error:', err);
+      alert('Failed to delete post: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
+  function toggleComments(postId) {
+    setOpenCommentsId(prev => (prev === postId ? null : postId));
+  }
 
   return (
     <section className="shop-feeds">
@@ -102,48 +128,139 @@ export default function ShopFeeds({ shop, refreshTrigger }) {
               <span className="feeds-empty-sub">Use the composer on the left to publish your first post!</span>
             </div>
           ) : (
-            feeds.facebookPosts.map(post => (
-              <article key={post.id} className="shop-post-card">
-                <div className="post-header">
-                  <img
-                    src={shop?.facebook?.pictureUrl || 'https://via.placeholder.com/40'}
-                    alt=""
-                    className="post-author-avatar"
-                  />
-                  <div className="post-header-info">
-                    <span className="post-author-name">{shop?.facebook?.pageName}</span>
-                    <span className="post-time">
-                      {new Date(post.created_time).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </span>
+            feeds.facebookPosts.map(post => {
+              const isCommentsOpen = openCommentsId === post.id;
+              const isDeleting = deletingId === post.id;
+
+              return (
+                <article key={post.id} className="shop-post-card">
+                  <div className="post-header">
+                    <img
+                      src={shop?.facebook?.pictureUrl || 'https://via.placeholder.com/40'}
+                      alt=""
+                      className="post-author-avatar"
+                    />
+                    <div className="post-header-info">
+                      <span className="post-author-name">{shop?.facebook?.pageName}</span>
+                      <span className="post-time">
+                        {new Date(post.created_time).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })} · 🌐 Public
+                      </span>
+                    </div>
+                    {post.permalink_url && (
+                      <a
+                        href={post.permalink_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="post-view-link"
+                      >
+                        View on FB ↗
+                      </a>
+                    )}
                   </div>
-                  {post.permalink_url && (
-                    <a
-                      href={post.permalink_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="post-view-link"
-                    >
-                      View on FB ↗
-                    </a>
+
+                  {post.message && (
+                    <p className="post-message-text">{post.message}</p>
                   )}
-                </div>
 
-                {post.message && (
-                  <p className="post-message-text">{post.message}</p>
-                )}
+                  {post.story && !post.message && (
+                    <p className="post-story-text">{post.story}</p>
+                  )}
 
-                {post.full_picture && (
-                  <div className="post-media-wrap">
-                    <img src={post.full_picture} alt="" className="post-media-img" />
+                  {post.full_picture && (
+                    <div className="post-media-wrap">
+                      <img src={post.full_picture} alt="" className="post-media-img" loading="lazy" />
+                    </div>
+                  )}
+
+                  {/* Social Action & Management Bar */}
+                  <div className="post-action-bar">
+                    <button
+                      type="button"
+                      className="action-bar-btn"
+                      onClick={() => window.open(post.permalink_url, '_blank')}
+                      title="Like on Facebook"
+                    >
+                      👍 <span>Like</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className={`action-bar-btn ${isCommentsOpen ? 'action-bar-btn--active' : ''}`}
+                      onClick={() => toggleComments(post.id)}
+                      title="Comments"
+                    >
+                      💬 <span>Comments</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="action-bar-btn"
+                      onClick={() => window.open(post.permalink_url, '_blank')}
+                      title="Share post"
+                    >
+                      🔄 <span>Share</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="action-bar-btn action-bar-btn--delete"
+                      onClick={() => handleDeletePost(post.id)}
+                      disabled={isDeleting}
+                      title="Delete this post from Facebook"
+                    >
+                      🗑️ <span>{isDeleting ? 'Deleting…' : 'Delete'}</span>
+                    </button>
                   </div>
-                )}
-              </article>
-            ))
+
+                  {/* Comments Drawer */}
+                  {isCommentsOpen && (
+                    <div className="post-comments-drawer">
+                      <div className="comments-drawer-header">
+                        <span className="comments-drawer-title">Comments & Engagement</span>
+                        <a
+                          href={post.permalink_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="comments-external-link"
+                        >
+                          Open on Facebook ↗
+                        </a>
+                      </div>
+
+                      <div className="comments-drawer-input-row">
+                        <img
+                          src={shop?.facebook?.pictureUrl || 'https://via.placeholder.com/32'}
+                          alt=""
+                          className="comment-user-avatar"
+                        />
+                        <input
+                          type="text"
+                          placeholder={`Comment as ${shop?.facebook?.pageName || 'Shop'}...`}
+                          className="comment-inline-input"
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') {
+                              window.open(post.permalink_url, '_blank');
+                            }
+                          }}
+                        />
+                        <button
+                          type="button"
+                          className="comment-inline-send"
+                          onClick={() => window.open(post.permalink_url, '_blank')}
+                        >
+                          Send ↗
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </article>
+              );
+            })
           )}
         </div>
       ) : (
@@ -168,6 +285,7 @@ export default function ShopFeeds({ shop, refreshTrigger }) {
                     src={item.thumbnail_url || item.media_url}
                     alt={item.caption || ''}
                     className="ig-grid-img"
+                    loading="lazy"
                   />
                   {item.media_type === 'VIDEO' && (
                     <span className="ig-reel-badge">▶ Reel</span>

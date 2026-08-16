@@ -1,34 +1,9 @@
 {
   "shops": [
     {
-      "id": "shop_461194823752748",
-      "createdAt": "2026-08-16T05:14:20.162Z",
-      "updatedAt": "2026-08-16T05:15:48.864Z",
-      "shopName": "CKR Technologies",
-      "ownerName": "Chandan Mallik",
-      "ownerEmail": "",
-      "ownerMetaUserId": "984330234649917",
-      "facebook": {
-        "pageId": "461194823752748",
-        "pageName": "CKR Technologies",
-        "pageAccessToken": "EAAXPZCkmpe14BSENBORoMjZCy6IQEQGMH4krikPCUVlZCRsTSZAzwqMva2nm2AlARBW4wLyUDI5OgVsMZB4KZBm6x3BZAysM6ZB4MLQB8wb2M0lddrQ2CUQ0tP6uoqWG2TZBYEQ8VuwjDQECLmv5LStqa56NqrhC9yF8886jZAhRFEZCK2DjRcoZBM8QXW0s1FCfkGI3IH1ovSTl",
-        "fanCount": 1096,
-        "pictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t39.30808-1/754143337_122169797786700192_6222183288504723018_n.jpg?stp=c274.0.790.791a_dst-jpg_s200x200_tt6&_nc_cat=110&ccb=1-7&_nc_sid=f907e8&_nc_ohc=bP0Ywp0ZtegQ7kNvwFJ_Rdg&_nc_oc=AdqsRSgmKqxYwXveOpV9sZ9torIYOVMHsv5tntLPDLbT1p0A43h7cJlo3WPxLrXVNkg&_nc_zt=24&_nc_ht=scontent.fdel31-1.fna&edm=AJdBtusEAAAA&_nc_gid=JuEiDZfb8bzI9ojXA-bJqA&_nc_tpa=Q5bMBQL04eGS_iTfN2C1rf8ytWCTWdZuhILdy83s9KK0rOqqDeFKiUAJUwafcUJmEonKtRyeqAvdTk_xuw&oh=00_AQH9GSKx_-VnnYsHTs5MMT_sbGHzQc6caeDJmayY_yW0Mg&oe=6A86FFCD"
-      },
-      "instagram": {
-        "igUserId": "17841471645943814",
-        "username": "argosmob_tech",
-        "name": "ArgosMob Tech & AI Pvt LTD",
-        "profilePictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t51.2885-15/470737682_1260820858528041_7812594431915758742_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=7d201b&_nc_ohc=PAnzvwz9178Q7kNvwF8d2Wc&_nc_oc=AdrLpZaMYExFnvBgSNClMfBgNvkXuJ9LrdSz7AZ9PknlrC41C0Uh65Z9Bz5qsXPNcH8&_nc_zt=23&_nc_ht=scontent.fdel31-1.fna&edm=AL-3X8kEAAAA&oh=00_AQEJYZfReFMGb8I2kHMnwom9veEJoDvVCwuMJOo3C6JAPQ&oe=6A8703E7",
-        "followersCount": 476,
-        "mediaCount": 24
-      },
-      "status": "active"
-    },
-    {
       "id": "shop_389542574764665",
       "createdAt": "2026-08-16T05:16:29.977Z",
-      "updatedAt": "2026-08-16T05:16:29.977Z",
+      "updatedAt": "2026-08-16T05:20:47.740Z",
       "shopName": "Frameography",
       "ownerName": "Chandan Mallik",
       "ownerEmail": "",
@@ -38,13 +13,13 @@
         "pageName": "Frameography",
         "pageAccessToken": "EAAXPZCkmpe14BSG1sZCV8uIyXEhPWA6EeOQnhjPieOTdhz0olHGETprPyevKZBZAosja4hVZBQHfsZAPrN7AXZCaupZBnwBH0wB8WZBBd6HION5xwvYzJZB5ZBCI1KDijB9T0RA7UU4ZC3XN2Fdw1o2AbpDZBA6oW7vKPJ42Xks3DiBFMZCHjSJvU0u1FMOEY2hCxHIZC1VeaNoEZCkR",
         "fanCount": 634,
-        "pictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t39.30808-1/326361290_1590372871429940_3433051600285838180_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=106&ccb=1-7&_nc_sid=f907e8&_nc_ohc=SIvsO3Tnu8gQ7kNvwHKk5RM&_nc_oc=Adqvklzl2Tspbz62iX1f8H6KmfDhefmC8Dx4BIXo_l1SHpjFUvdew_EwQ0aAS6ZEb6w&_nc_zt=24&_nc_ht=scontent.fdel31-1.fna&edm=AGaHXAAEAAAA&_nc_gid=Qi2qDw0-BYOjmWjsOjkJVw&_nc_tpa=Q5bMBQKxEeLdtJ35P0_nG0hNTKjpSqHE1wYOfFL720YltUTqMNQ5oocuT8pwDGyOJ6WUinkGTfuGbpT42g&oh=00_AQG3_YCGH7kNHSt1M7IV9vXynJVG_SHus4oiSmxEfs7pkw&oe=6A872540"
+        "pictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t39.30808-1/326361290_1590372871429940_3433051600285838180_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=106&ccb=1-7&_nc_sid=f907e8&_nc_ohc=SIvsO3Tnu8gQ7kNvwHKk5RM&_nc_oc=Adqvklzl2Tspbz62iX1f8H6KmfDhefmC8Dx4BIXo_l1SHpjFUvdew_EwQ0aAS6ZEb6w&_nc_zt=24&_nc_ht=scontent.fdel31-1.fna&edm=AJdBtusEAAAA&_nc_gid=_8X1hvbd6limBdCtOGkxBw&_nc_tpa=Q5bMBQJNJOEwWFgx8RV5RZ3ieYkw1fxgkwchUNuCzSrqbbhGqu9kwj5rgQo22MkWXM75iALuaNo3V93oEA&oh=00_AQGv5MAvTkDWQjqRMXf3jTcG34spscfQuDGLBP1JvWjBow&oe=6A872540"
       },
       "instagram": {
         "igUserId": "17841405518453760",
         "username": "frameography_official",
         "name": "Frameography | Wedding Photographer Lucknow",
-        "profilePictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t51.82787-15/588223552_18388691605183949_1069360937617450020_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=7d201b&_nc_ohc=ae2tU8GoaAkQ7kNvwHAY8Y9&_nc_oc=AdrdNl50znWfq7TRUUVF2vS-tLMZMdp1FUOqJqLbyHYE4obnzkinUpc09_iJlDgUGhM&_nc_zt=23&_nc_ht=scontent.fdel31-1.fna&edm=AGaHXAAEAAAA&_nc_gid=Qi2qDw0-BYOjmWjsOjkJVw&oh=00_AQEtSDtB_d5EQJ12f901jX7rVMrhFABKp1Z30k_3LrQZ-A&oe=6A871B0B",
+        "profilePictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t51.82787-15/588223552_18388691605183949_1069360937617450020_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=7d201b&_nc_ohc=ae2tU8GoaAkQ7kNvwHAY8Y9&_nc_oc=AdrdNl50znWfq7TRUUVF2vS-tLMZMdp1FUOqJqLbyHYE4obnzkinUpc09_iJlDgUGhM&_nc_zt=23&_nc_ht=scontent.fdel31-1.fna&edm=AL-3X8kEAAAA&_nc_gid=s9qUDHy-eB8koOy6N3tE0w&oh=00_AQHPPoX1XfC0HIg20bqfgecJ6l8TC5WAKGNUoaI9tKwUqQ&oe=6A871B0B",
         "followersCount": 1018,
         "mediaCount": 241
       },
@@ -90,6 +65,31 @@
         "profilePictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t51.82787-15/660065051_18086001473595784_5323363112444061946_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=7d201b&_nc_ohc=uiIVr0CLw10Q7kNvwFpimen&_nc_oc=Adrrwa0aVaNZcwXscUdwRl6GcdeZGSJ3cSC7vAcLOUNmlbiT1WQ9QCGlFiQIA8MBBJA&_nc_zt=23&_nc_ht=scontent.fdel31-1.fna&edm=AL-3X8kEAAAA&_nc_gid=wkQk5AbVJJgqM3BOIuaPlg&oh=00_AQFvIsFdRDtzAejGXIBSGPA3SiOkMnNaQSQUp7V1z5umhg&oe=6A87319B",
         "followersCount": 198027,
         "mediaCount": 841
+      },
+      "status": "active"
+    },
+    {
+      "id": "shop_461194823752748",
+      "createdAt": "2026-08-16T05:21:44.237Z",
+      "updatedAt": "2026-08-16T05:23:07.077Z",
+      "shopName": "CKR Technologies",
+      "ownerName": "Chandan Mallik",
+      "ownerEmail": "",
+      "ownerMetaUserId": "984330234649917",
+      "facebook": {
+        "pageId": "461194823752748",
+        "pageName": "CKR Technologies",
+        "pageAccessToken": "EAAXPZCkmpe14BSJrNW8E9ZACW5LW3lWdB9qmmSZBQ9xKHObtNdbkagazNcVBcFk4wUpV634ZByBCI8FtlCY5NBVYGXwgnFoaqu7uoqR9wREPZC8vayAREKrEXD5RCtJn25HPjmGcWXp4ojBeG1QVthMVkYoraOlCkZCtNKPHKKBj7N20Tb4PQsgYfZAEdKD2uedOkLL",
+        "fanCount": 1096,
+        "pictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t39.30808-1/754143337_122169797786700192_6222183288504723018_n.jpg?stp=c274.0.790.791a_dst-jpg_s200x200_tt6&_nc_cat=110&ccb=1-7&_nc_sid=f907e8&_nc_ohc=bP0Ywp0ZtegQ7kNvwFJ_Rdg&_nc_oc=AdqsRSgmKqxYwXveOpV9sZ9torIYOVMHsv5tntLPDLbT1p0A43h7cJlo3WPxLrXVNkg&_nc_zt=24&_nc_ht=scontent.fdel31-1.fna&edm=AJdBtusEAAAA&_nc_gid=-BK3f8KwTltcF7PKkg4N5g&_nc_tpa=Q5bMBQICxkR2u_v7w1BTcDuj7JodwECUH7CkgIqBzHTB0JV9JbMOWcrxW0HzltwCvK67GlyrS8mvZJaMMg&oh=00_AQEJoD9eMQzmTDppZN3qs4F0rlYsrJslfmhRyi1E_HzNVQ&oe=6A86FFCD"
+      },
+      "instagram": {
+        "igUserId": "17841471645943814",
+        "username": "argosmob_tech",
+        "name": "ArgosMob Tech & AI Pvt LTD",
+        "profilePictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t51.2885-15/470737682_1260820858528041_7812594431915758742_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=7d201b&_nc_ohc=PAnzvwz9178Q7kNvwF8d2Wc&_nc_oc=AdrLpZaMYExFnvBgSNClMfBgNvkXuJ9LrdSz7AZ9PknlrC41C0Uh65Z9Bz5qsXPNcH8&_nc_zt=23&_nc_ht=scontent.fdel31-1.fna&edm=AL-3X8kEAAAA&oh=00_AQEJYZfReFMGb8I2kHMnwom9veEJoDvVCwuMJOo3C6JAPQ&oe=6A8703E7",
+        "followersCount": 476,
+        "mediaCount": 24
       },
       "status": "active"
     }

@@ -147,6 +147,145 @@
   max-height: 400px;
 }
 
+.post-story-text {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* ── Social Action & Management Bar ──────────────────────────── */
+.post-action-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.action-bar-btn {
+  flex: 1;
+  min-width: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.action-bar-btn:hover {
+  background: var(--bg-surface-3);
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.action-bar-btn--active {
+  background: rgba(24, 119, 242, 0.15);
+  border-color: #1877f2;
+  color: #93c5fd;
+}
+
+.action-bar-btn--delete {
+  flex: 0 0 auto;
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.action-bar-btn--delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+}
+
+.action-bar-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Comments Drawer ─────────────────────────────────────────── */
+.post-comments-drawer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: var(--bg-surface-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  animation: fadeIn 0.2s ease;
+}
+
+.comments-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.comments-drawer-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.comments-external-link {
+  font-size: 11.5px;
+  color: #60a5fa;
+  font-weight: 600;
+}
+
+.comments-drawer-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.comment-user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.comment-inline-input {
+  flex: 1;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.comment-inline-input:focus {
+  outline: none;
+  border-color: #1877f2;
+}
+
+.comment-inline-send {
+  padding: 8px 12px;
+  background: #1877f2;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.comment-inline-send:hover {
+  background: #166fe5;
+}
+
 /* ── Instagram Grid ─────────────────────────────────────────── */
 .ig-tiles-grid {
   display: grid;

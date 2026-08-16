@@ -174,3 +174,20 @@ exports.postReel = async (req, res) => {
     res.status(500).json({ success: false, error: formatted.message, code: formatted.code, details: formatted.raw });
   }
 };
+
+// ── DELETE /api/v2/posts/:postId ──────────────────────────────
+exports.deletePost = async (req, res) => {
+  try {
+    const shopId = getShopId(req);
+    const postId = req.params.postId;
+    if (!shopId) return res.status(400).json({ success: false, error: 'Shop ID is required.', code: 'MISSING_SHOP_ID' });
+    if (!postId) return res.status(400).json({ success: false, error: 'Post ID is required.', code: 'MISSING_POST_ID' });
+
+    const result = await multiTenantService.deleteFacebookPost(shopId, postId);
+    res.json({ success: true, message: 'Post deleted successfully from Facebook Page.', data: result });
+  } catch (err) {
+    const formatted = formatError(err);
+    console.error(`[multiTenantController:deletePost] ${formatted.code}:`, formatted.raw);
+    res.status(500).json({ success: false, error: formatted.message, code: formatted.code, details: formatted.raw });
+  }
+};
