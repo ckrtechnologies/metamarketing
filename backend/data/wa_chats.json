@@ -6,8 +6,8 @@
       "customerPhone": "7982296878",
       "customerName": "Chandan Mallik",
       "unreadCount": 0,
-      "lastMessage": "any other question?",
-      "lastMessageAt": "2026-08-16T11:37:37.694Z",
+      "lastMessage": "Thank you! We received your message.",
+      "lastMessageAt": "2026-08-16T11:42:08.042Z",
       "lastInboundAt": "2026-08-16T11:34:45.000Z",
       "messages": [
         {
@@ -63,10 +63,19 @@
           "templateName": null,
           "status": "sent",
           "timestamp": "2026-08-16T11:37:37.694Z"
+        },
+        {
+          "id": "msg_out_1786880528042_cd84",
+          "wamid": "wamid.HBgMOTE3OTgyMjk2ODc4FQIAERgSQzlBNEYyNTk1MDJFNUI1OTc5AA==",
+          "direction": "outbound",
+          "text": "Thank you! We received your message.",
+          "templateName": null,
+          "status": "sent",
+          "timestamp": "2026-08-16T11:42:08.042Z"
         }
       ],
       "createdAt": "2026-08-16T11:34:45.000Z",
-      "updatedAt": "2026-08-16T11:37:37.694Z"
+      "updatedAt": "2026-08-16T11:42:08.042Z"
     }
   }
 }
