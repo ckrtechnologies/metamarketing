@@ -6,6 +6,8 @@ const fs = require('fs');
 
 const facebookRoutes = require('./routes/facebook');
 const instagramRoutes = require('./routes/instagram');
+const authRoutes = require('./routes/auth');
+const multiTenantRoutes = require('./routes/multiTenant');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -18,9 +20,9 @@ if (!fs.existsSync(uploadDir)) {
 
 // ── Middleware ────────────────────────────────────────────────
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'],
-  methods: ['GET', 'POST', 'DELETE'],
-  allowedHeaders: ['Content-Type'],
+  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000'],
+  methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-shop-id'],
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -29,6 +31,8 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // ── Routes ────────────────────────────────────────────────────
 app.use('/api/fb', facebookRoutes);
 app.use('/api/ig', instagramRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/v2', multiTenantRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

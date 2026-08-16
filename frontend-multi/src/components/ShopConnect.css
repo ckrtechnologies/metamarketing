@@ -1,0 +1,259 @@
+.connect-hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  background: radial-gradient(circle at 50% 10%, rgba(24, 119, 242, 0.12) 0%, transparent 60%),
+              radial-gradient(circle at 80% 80%, rgba(214, 36, 159, 0.1) 0%, transparent 60%);
+}
+
+.connect-card {
+  width: 100%;
+  max-width: 540px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.connect-card__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.connect-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fb-blue);
+  box-shadow: 0 0 8px var(--fb-blue);
+}
+
+.connect-icons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.connect-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  box-shadow: var(--shadow-md);
+}
+
+.connect-icon--fb {
+  background: #1877f2;
+}
+
+.connect-icon--ig {
+  background: var(--ig-gradient);
+}
+
+.connect-icon-plus {
+  font-size: 20px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.connect-title {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+}
+
+.connect-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 440px;
+  margin-bottom: 28px;
+}
+
+.connect-features {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  margin-bottom: 28px;
+  text-align: left;
+}
+
+.connect-feature-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.feat-icon {
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.connect-feature-item strong {
+  font-size: 13.5px;
+  color: var(--text-primary);
+  display: block;
+}
+
+.connect-feature-item p {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.connect-error {
+  width: 100%;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.connect-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px 24px;
+  background: #1877f2;
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-weight: 700;
+  transition: all var(--transition);
+  box-shadow: 0 4px 20px rgba(24, 119, 242, 0.4);
+}
+
+.connect-btn:hover:not(:disabled) {
+  background: #166fe5;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(24, 119, 242, 0.5);
+}
+
+.connect-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.connect-footnote {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 14px;
+}
+
+/* ── Existing Shops List ─────────────────────────────────────── */
+.existing-shops-section {
+  width: 100%;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.existing-shops-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.existing-shops-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.existing-shop-chip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  text-align: left;
+  transition: all var(--transition);
+}
+
+.existing-shop-chip:hover {
+  background: var(--bg-surface-3);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateX(4px);
+}
+
+.shop-chip-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.shop-chip-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.shop-chip-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.shop-chip-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.shop-chip-arrow {
+  color: var(--text-muted);
+  font-weight: 700;
+}

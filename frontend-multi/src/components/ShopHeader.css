@@ -1,0 +1,156 @@
+.shop-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 28px;
+  background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(24, 119, 242, 0.08) 50%, rgba(214, 36, 159, 0.08) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  flex-wrap: wrap;
+}
+
+.shop-identity {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.shop-avatar-cluster {
+  position: relative;
+}
+
+.shop-main-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.15);
+  box-shadow: var(--shadow-sm);
+  background: var(--bg-surface-2);
+}
+
+.shop-main-avatar--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+}
+
+.shop-status-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--success);
+  border: 2px solid var(--bg-surface);
+  animation: pulse 2s infinite;
+}
+
+.shop-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.shop-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.shop-name {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+.shop-owner-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+}
+
+.shop-platforms-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.platform-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.platform-pill--fb {
+  background: rgba(24, 119, 242, 0.15);
+  border: 1px solid rgba(24, 119, 242, 0.35);
+  color: #93c5fd;
+}
+
+.platform-pill--ig {
+  background: rgba(214, 36, 159, 0.15);
+  border: 1px solid rgba(214, 36, 159, 0.35);
+  color: #f472b6;
+}
+
+.platform-pill--warn {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fcd34d;
+}
+
+.pill-followers {
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.shop-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-action-btn {
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  transition: all var(--transition);
+}
+
+.header-action-btn--switch {
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+}
+
+.header-action-btn--switch:hover {
+  background: var(--bg-surface-3);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.header-action-btn--disconnect {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+.header-action-btn--disconnect:hover {
+  background: var(--error);
+  color: #fff;
+}

@@ -1,0 +1,27 @@
+{
+  "shops": [
+    {
+      "id": "shop_461194823752748",
+      "createdAt": "2026-08-16T04:56:16.980Z",
+      "updatedAt": "2026-08-16T04:56:16.980Z",
+      "shopName": "CKR Technologies Store",
+      "ownerName": "Chandan Mallik",
+      "ownerEmail": "chandan@ckrtechnologies.com",
+      "facebook": {
+        "pageId": "461194823752748",
+        "pageName": "CKR Technologies",
+        "pageAccessToken": "EAAXPZCkmpe14BSOo8NetsGNZCLZC0WOiqM7D8XyeDbgZCnZAqn60UdTWnm1mHhxCubPOCYSso9Pba2pk4JGnQJmZAQTiiMw72qPOC0ULIWwar2DWu3TBjfcn9HdL0gLgI1Nd01Bukzy96BZA3gACbQTwZAusOSAZB1Ypt9NFG15unRl8N275mTD9ZBx48A1oaP3wEkkvSj",
+        "fanCount": 1096,
+        "pictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t39.30808-1/451634288_122108754122409749_748443900388439148_n.png?stp=c0.5000x5000f_dst-png_s200x200_tt6&_nc_cat=103&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=K-d-1V5gN28Q7kNvwG5pTcL&_nc_oc=Adp8yZzZ9w5tN_q4&_nc_zt=24&_nc_ht=scontent.fdel31-1.fna&edm=APRAPSkEAAAA&oh=00_AQEzcZ6j-p1r2k&oe=6A870DE7"
+      },
+      "instagram": {
+        "igUserId": "17841471645943814",
+        "username": "argosmob_tech",
+        "followersCount": 476,
+        "mediaCount": 24,
+        "profilePictureUrl": "https://scontent.fdel31-1.fna.fbcdn.net/v/t51.2885-15/470737682_1260820858528041_7812594431915758742_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=7d201b&_nc_ohc=PAnzvwz9178Q7kNvwF8d2Wc&_nc_oc=AdrLpZaMYExFnvBgSNClMfBgNvkXuJ9LrdSz7AZ9PknlrC41C0Uh65Z9Bz5qsXPNcH8&_nc_zt=23&_nc_ht=scontent.fdel31-1.fna&edm=AL-3X8kEAAAA&oh=00_AQEJYZfReFMGb8I2kHMnwom9veEJoDvVCwuMJOo3C6JAPQ&oe=6A8703E7"
+      },
+      "status": "active"
+    }
+  ]
+}
